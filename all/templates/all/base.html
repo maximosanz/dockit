@@ -1,0 +1,38 @@
+<!DOCTYPE html><html>
+<head><title>
+{% block title %}
+{% endblock %}
+</title>
+{% load staticfiles %}
+
+<!--bootstrap-->
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!--jquery, used by highcharts, jsmol and opentip-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+
+<!--highcharts-->
+<script src="http://code.highcharts.com/highcharts.js"></script>
+
+<!--jsmol-->
+<script src="/static/jsmol/js/JSmolCore.js"></script>
+<script src="/static/jsmol/js/JSmol.js"></script>
+<script src="/static/jsmol/js/JSmolApplet.js"></script>
+<script src="/static/jsmol/js/JSmolControls.js"></script>
+<script src="/static/jsmol/js/JSmolApi.js"></script>
+<script src="/static/jsmol/js/j2sjmol.js"></script>
+<script src="/static/jsmol/js/JSmoljQueryExt.js"></script>
+
+<!--personal jsmol functions-->
+<script src="/static/jsmol_functions.js"></script>
+
+<!--opentip-->
+<script src="https://raw.github.com/enyo/opentip/master/downloads/opentip-jquery-excanvas.min.js"></script>
+<link href="/static/opentip.css" rel="stylesheet">
+
+</head>
+
+<body class="container">
+{% block content %}
+{% endblock %}
+</body></html>

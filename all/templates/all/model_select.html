@@ -1,0 +1,21 @@
+{% extends 'all/base.html' %}{% block title %}Model select{% endblock %}
+{% block content %}
+<h1>Model search results</h1>
+<table class="table"><tr>
+<th>PDB ID</th>
+<th>Method</th>
+<th>ZRANK score</th>
+<th>L-RMSD<th>
+</tr>
+{% for model in results %}
+	<tr>
+	<td>{{ model.target }}</td>
+	<td>{{ model.method }}</td>
+	<td></td>
+	<td></td>
+	<td><a href="{% url 'model' model.id %}">View model</a></td>
+	<td><a href="{% url 'target_info' model.name %}">View target</a></td>
+	</tr>
+{% endfor %}</table>
+<a href="{% url 'search' %}">Back to search</a>
+{% endblock %}

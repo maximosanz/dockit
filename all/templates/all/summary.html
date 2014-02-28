@@ -1,0 +1,175 @@
+{% extends 'all/base.html' %}{% block title %}Summary{% endblock %}
+{% block content %}
+<h1>Summary</h1>
+
+<div id="method_comparison" style="width:100%; height:600px;"></div>
+
+<form name="target_choice"">
+Choose a target:&nbsp;&nbsp;<select name="target_choice_all" onChange='change_graph(document.target_choice.target_choice_all.options[document.target_choice.target_choice_all.selectedIndex].value)' style="width: 90px">
+{% for each in target_names %}
+<option value={{ each }}>{{ each }}</option>
+{% endfor %}
+</select></form>
+
+<div id="irmsd_comparison" style="width:100%; height:600px;"></div>
+
+<script>
+//change method comparison graph when target choice is changed
+function change_graph(target) {
+document.location.href="/summary_"+target;
+}
+
+//Method comparison graph
+var irmsd_by_method = [{% for a in irmsd_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var average_irmsds = [{% for b in average_irmsds %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+for (var i=0;i<irmsd_by_method.length;i++) {
+irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
+average_irmsds[i] = parseFloat(average_irmsds[i])
+}
+
+$(function () {
+	$('#method_comparison').highcharts({
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: 'Comparison of docking methods for {{ target_choice }}'
+	},
+	legend : {
+		enabled: true
+	},
+	xAxis: {
+		title: {
+			text: 'Docking method'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'I-RMSD of best model produced for {{ target_choice }}'
+		}
+	},
+	/*plotOptions: {
+		series: {
+			cursor: 'pointer',
+			point : {
+				events: {
+					click : function(){
+						location.href = "/target/";
+					}
+				}
+			}
+		}
+	},
+	tooltip: {
+		useHTML : true,
+		formatter: function() {
+			
+		}
+	},*/
+	xAxis: {
+		categories: methods
+	},
+	series: [{
+		name: 'I-RMSD of best model produced for {{ target_choice }}',
+		data: irmsd_by_method
+	}, {
+		name: 'Average I-RMSD of best models across all targets',
+		data: average_irmsds
+	}]
+	});
+});
+
+//I-RMSD comparison graph
+var target_irmsds = [{% for i in target_irmsds %}"{{ i }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var best_model_irmsds = [{% for j in best_model_irmsds %}"{{ j }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var target_names = [{% for k in target_names %}"{{ k }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var target_difficulties = [{% for l in target_difficulties %}"{{ l }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+var data_series_rigid = []
+var data_series_medium = []
+var data_series_difficult = []
+
+for (var i=0;i<target_irmsds.length;i++) {
+if (target_difficulties[i]=='Rigid') {
+data_series_rigid.push({'x':parseFloat(target_irmsds[i]),'y':parseFloat(best_model_irmsds[i]),'target':target_names[i],'difficulty':target_difficulties[i]})
+} else if (target_difficulties[i]=='Medium') {
+data_series_medium.push({'x':parseFloat(target_irmsds[i]),'y':parseFloat(best_model_irmsds[i]),'target':target_names[i],'difficulty':target_difficulties[i]})
+} else {
+data_series_difficult.push({'x':parseFloat(target_irmsds[i]),'y':parseFloat(best_model_irmsds[i]),'target':target_names[i],'difficulty':target_difficulties[i]})
+}}
+
+$(function () {
+	$('#irmsd_comparison').highcharts({
+	chart: {
+		type: 'scatter'
+	},
+	title: {
+		text: 'I-RMSD comparison for Benchmark targets'
+	},
+	legend : {
+		enabled: true
+	},
+	xAxis: {
+		title: {
+			text: 'I-RMSD of native unbound'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'I-RMSD of best model produced'
+		}
+	},
+	plotOptions: {
+		series: {
+			cursor: 'pointer',
+			point : {
+				events: {
+					click : function(){
+						location.href = "/target/"+this.options.target;
+					}
+				}
+			}
+		}
+	},
+	tooltip: {
+		useHTML : true,
+		formatter: function() {
+			var tooltip_text = '<table>';
+			tooltip_text += '<tr><td><b>Target:</b></td><td>'+this.point.options.target+'</td></tr>';
+			tooltip_text += '<tr><td><b>Difficulty:</b></td><td>'+this.point.options.difficulty+'</td></tr>';
+			tooltip_text += '<tr><td><b>Native I-RMSD:</b></td><td>'+this.x+'</td></tr>';
+			tooltip_text += '<tr><td><b>Model I-RMSD:</b></td><td>'+this.y+'</td></tr>';
+			tooltip_text += '</table>';
+			return tooltip_text;
+		}
+	},
+	series: [{
+		name: 'Rigid',
+		data: data_series_rigid,
+		marker: {
+			symbol: 'circle'
+		},
+		color: '#990000'
+	}, {
+		name: 'Medium',
+		data: data_series_medium,
+		marker: {
+			symbol: 'circle'
+		},
+		color: '#009900'
+	}, {
+		name: 'Difficult',
+		data: data_series_difficult,
+		marker: {
+			symbol: 'circle'
+		},
+		color: '#000099'
+	}]
+	});
+});
+</script>
+
+<a href="{% url 'search' %}">Back to start</a>
+{% endblock %}

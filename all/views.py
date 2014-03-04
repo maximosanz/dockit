@@ -6,7 +6,7 @@ from all.models import Target, Method, Model, Refinement, ScoringFunction, Score
 from django.core.urlresolvers import reverse
 from all.forms import model_select_form
 from all.extract import extract_interactions
-from chartit import DataPool, Chart
+import re
 
 def target(request):
 	#page with target table
@@ -30,7 +30,17 @@ def search(request):
                 if form.is_valid():
                         target = form.cleaned_data['target']
                         method = form.cleaned_data['method']
-                        return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method}))
+			refinement = form.cleaned_data['refinement']
+			i_rmsd_t = str(form.cleaned_data['i_rmsd_threshold'])
+			i_rmsd_threshold = re.sub('\.', '-', i_rmsd_t)
+			l_rmsd_t = str(form.cleaned_data['l_rmsd_threshold'])
+			l_rmsd_threshold = re.sub('\.', '-', l_rmsd_t)
+			r_rmsd_t = str(form.cleaned_data['r_rmsd_threshold'])
+			r_rmsd_threshold = re.sub('\.', '-', r_rmsd_t)
+			fnat_t = str(form.cleaned_data['fnat_threshold'])
+			fnat_threshold = re.sub('\.', '-', fnat_t)
+
+                        return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold}))
         context = {'Target':Target.objects.all(),'Rigid':Target.objects.filter(difficulty='Rigid'),'Medium':Target.objects.filter(difficulty='Medium'),'Difficult':Target.objects.filter(difficulty='Difficult'),'form':form}
         return render(request,'all/search.html',context)
 
@@ -70,10 +80,33 @@ def summary(request,target):
 	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds}
 	return render(request,'all/summary.html',context)
 
-def model_select(request, target, method):
-        results = Model.objects.filter(target=target,method=method)
-        context = {'results':results}
-        return render(request, 'all/model_select.html', context)
+def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold):
+	i_rmsd_threshold = float(re.sub('-', '.', i_rmsd_threshold))
+	l_rmsd_threshold = float(re.sub('-', '.', l_rmsd_threshold))
+	r_rmsd_threshold = float(re.sub('-', '.', r_rmsd_threshold))
+	fnat_threshold = float(re.sub('-', '.', fnat_threshold))
+#	results = Model.objects.filter(target__name=target, method__name=method, refinement__name=refinement, i_rmsd__lte=i_rmsd_threshold)
+	if target not in ['All', 'Rigid', 'Medium', 'Difficult']:
+		results = Model.objects.filter(target__name=target)
+	elif target != 'All':
+		results = Model.objects.filter(target__difficulty=target)
+	else:
+		results = Model.objects.all()
+	if i_rmsd_threshold != 0:
+		results = results.filter(i_rmsd__lte=i_rmsd_threshold)
+	if l_rmsd_threshold != 0:
+		results = results.filter(l_rmsd__lte=l_rmsd_threshold)
+	if r_rmsd_threshold != 0:
+		results = results.filter(r_rmsd__lte=r_rmsd_threshold)
+	if fnat_threshold != 0:
+		results = results.filter(fnat__gte=fnat_threshold)
+	if method != 'All':
+		results = results.filter(method__name=method)
+	if refinement != 'All':
+		results = results.filter(refinement__name=refinement)
+
+	context = {'results':results}
+	return render(request, 'all/model_select.html', context)
 
 def scoring(request, scorer, target):
 	#comparison of scoring functions

@@ -1,6 +1,0 @@
-{% extends 'all/base.html' %}{% block title %}Methods{% endblock %}
-{% block content %}
-<h1>Docking methods</h1>
-
-<a href="{% url 'search' %}">Back to start</a>
-{% endblock %}

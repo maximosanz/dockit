@@ -33,9 +33,9 @@
 
 <a href="{% url 'method' %}">View information on docking methods</a><br><br>
 
-<a href="{% url 'summary' '1BGX' %}">View summary of data</a><br><br>
+<a href="{% url 'summary' '1BGX'%}">View summary of data</a><br><br>
 
-<a href="{% url 'scoring' 'PISA' '1BGX' %}">View summary of scoring functions</a><br><br>
+<a href="{% url 'scoring' 'PISA' '1BGX'%}">View summary of scoring functions</a><br><br>
 
 <a href="{% url 'refinement' %}">View information on refinement</a>
 

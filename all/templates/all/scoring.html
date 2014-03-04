@@ -1,0 +1,99 @@
+{% extends 'all/base.html' %}{% block title %}Scoring{% endblock %}
+{% block content %}
+<h1>Scoring</h1>
+
+<div id="scoring_graph" style="width:100%; height:600px;"></div>
+
+<form name="scoring_graph_choices">
+Choose a target:&nbsp;&nbsp;<select name="target_choice_all" style="width: 90px">
+{% for each_target in target_names %}
+<option value={{ each_target }}>{{ each_target }}</option>
+{% endfor %}
+</select>
+Choose a scoring method:&nbsp;&nbsp;<select name="scoring_method" style="width: 90px">
+{% for each_scorer in scorer_names %}
+<option value={{ each_scorer }}>{{ each_scorer }}</option>
+{% endfor %}
+</select>
+<button onClick='change_graph(document.scoring_graph_choices.target_choice_all.options[document.scoring_graph_choices.target_choice_all.selectedIndex].value,document.scoring_graph_choices.scoring_method.options[document.scoring_graph_choices.scoring_method.selectedIndex].value)'>Update</button>
+</form>
+
+<script>
+//change scoring graph when options are changed
+function change_graph(target,scorer) {
+//document.location.href="/scoring_"+scorer+"_"+target;
+//document.location.href="{% url 'scoring' 'scorer' 'target' %}".replace("scorer", scorer).replace("target",target);
+document.location.href="{% url 'scoring' '1SYX' 'ZRANK2' %}"
+}
+
+var model_irmsds = [{% for a in model_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var scores = [{% for b in scores %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var model_ids = [{% for c in model_ids %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var model_methods = [{% for d in model_methods %}"{{ d }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+var data_series = []
+for (var i=0;i<model_irmsds.length;i++) {
+data_series.push({'x':parseFloat(model_irmsds[i]),'y':parseFloat(scores[i]),'model_id':parseInt(model_ids[i]),'model_method':model_methods[i]})
+}
+
+$(function () {
+	$('#scoring_graph').highcharts({
+	chart: {
+		type: 'scatter'
+	},
+	title: {
+		text: '{{ scorer_choice }} score against I-RMSD for each model in {{ target_choice }}'
+	},
+	legend : {
+		enabled: true
+	},
+	xAxis: {
+		title: {
+			text: 'I-RMSD of model'
+		}
+	},
+	yAxis: {
+		title: {
+			text: '{{ scorer_choice }} score'
+		}
+	},
+	plotOptions: {
+		series: {
+			turboThreshold: 0,
+			cursor: 'pointer',
+			point : {
+				events: {
+					click : function(){
+						location.href = "/model_"+this.options.model_id;
+					}
+				}
+			}
+		}
+	},
+	tooltip: {
+		useHTML : true,
+		formatter: function() {
+			var tooltip_text = '<table>';
+			tooltip_text += '<tr><td><b>Model method:</b></td><td>'+this.point.options.model_method+'</td></tr>';
+			tooltip_text += '<tr><td><b>I-RMSD of model:</b></td><td>'+this.x+'</td></tr>';
+			tooltip_text += '<tr><td><b>{{ scorer_choice }} score:</b></td><td>'+this.y+'</td></tr>';
+			tooltip_text += '</table>';
+			return tooltip_text;
+		}
+	},
+	series: [
+		{% for method in method_names %}{
+		name: '{{ method }}',
+		marker : {
+			symbol: 'circle',
+			radius: 2
+		},
+		data: data_series.filter(function (element) {
+			return element.model_method == '{{ method }}';
+		})}{% if forloop.last %}{%else%},{%endif%}{% endfor %}
+	]});
+});
+</script>
+
+<a href="{% url 'search' %}">Back to start</a>
+{% endblock %}

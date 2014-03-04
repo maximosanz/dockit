@@ -116,12 +116,10 @@ def refinement(request):
 	#for the minute constructs a graph for ZDock v ZDock/FiberDock performance for one target
 	no_ref_irmsds = []
 	improvements = []
-	ref_model_ids = []
 	for i in range(500):
 		no_ref_irmsds.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='Nothing').i_rmsd)
 		improvements.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='FiberDock').i_rmsd - Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='Nothing').i_rmsd)
-		ref_model_ids.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='FiberDock').id)
-	context = {'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids}
+	context = {'no_ref_irmsds':no_ref_irmsds,'improvements':improvements}
 	return render(request, 'all/refinement.html', context)
 
 

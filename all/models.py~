@@ -67,18 +67,3 @@ class Refinement(models.Model):
     description = models.CharField(max_length=100L)
     class Meta:
         db_table = 'refinement'
-
-class ScoringFunction(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=20L)
-    description = models.CharField(max_length=200L)
-    class Meta:
-        db_table = 'scoring_function'
-
-class Score(models.Model):
-    id = models.IntegerField(primary_key=True)
-    model = models.ForeignKey(Model)
-    scoring_function = models.ForeignKey('ScoringFunction')
-    score = models.FloatField(null=True, blank=True)
-    class Meta:
-        db_table = 'score'

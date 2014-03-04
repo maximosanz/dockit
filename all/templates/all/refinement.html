@@ -1,0 +1,69 @@
+{% extends 'all/base.html' %}{% block title %}Refinement{% endblock %}
+{% block content %}
+<h1>Refinement</h1>
+
+<div id="refinement_graph" style="width:100%; height:600px;"></div>
+
+<script>
+var no_ref_irmsds = [{% for a in no_ref_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var improvements = [{% for b in improvements %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var ref_model_ids = [{% for c in ref_model_ids %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+var data_series = []
+for (var i=0;i<improvements.length;i++) {
+data_series.push({'x':parseFloat(no_ref_irmsds[i]),'y':parseFloat(improvements[i]),'ref_model_id':parseInt(ref_model_ids[i])})
+}
+
+$(function () {
+	$('#refinement_graph').highcharts({
+	chart: {
+		type: 'scatter'
+	},
+	title: {
+		text: 'Improvement of I-RMSD on refinement'
+	},
+	legend : {
+		enabled: false
+	},
+	xAxis: {
+		title: {
+			text: 'Model I-RMSD without refinement'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'Change in I-RMSD on refinement'
+		}
+	},
+	plotOptions: {
+		series: {
+			cursor: 'pointer',
+			point : {
+				events: {
+					click : function(){
+						location.href = "/model_"+this.options.ref_model_id;
+					}
+				}
+			}
+		}
+	},
+	/*tooltip: {
+		useHTML : true,
+		formatter: function() {
+			var tooltip_text = '<table>';
+			tooltip_text += '<tr><td><b>Model method:</b></td><td>'+this.point.options.model_method+'</td></tr>';
+			tooltip_text += '<tr><td><b>I-RMSD of model:</b></td><td>'+this.x+'</td></tr>';
+			tooltip_text += '<tr><td><b>{{ scorer_choice }} score:</b></td><td>'+this.y+'</td></tr>';
+			tooltip_text += '</table>';
+			return tooltip_text;
+		}
+	},*/
+	series: [{
+		data: data_series
+	}]
+	});
+});
+</script>
+
+<a href="{% url 'search' %}">Back to start</a>
+{% endblock %}

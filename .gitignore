@@ -1,0 +1,7 @@
+dockit/settings.py
+dockit/*.pyc
+dockit/*~
+all/*.pyc
+all/*~
+all/templates/all/*~
+all/static/*

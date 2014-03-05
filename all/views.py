@@ -60,7 +60,7 @@ def summary(request,target):
 			print(each.name)
 
 	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds}
-	return render(request,'all/summary.html',context)
+	return insert_form_and_go(request,'all/summary.html',context)
 
 def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold):
 	i_rmsd_threshold = float(re.sub('-', '.', i_rmsd_threshold))

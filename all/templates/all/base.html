@@ -69,9 +69,9 @@ padding-top: 60px;
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Target<b class="caret"></b></a>
           <ul class="dropdown-menu">
-            <li><a href="{% url 'target' %}">View all benchmarks</a></li>
-            <li class="divider"></li>
+            <table class="table" style="width:320px;border-collapse:separate;border-spacing:10px">
             <form name="target_select_nav">
+		<tr><td><a href="{% url 'target' %}">View all benchmarks</a></td><td></td></tr>
 		<tr><td>Select from all targets:</td>
 		<td><select name="target_choice_all" onChange=goTo(document.target_select_nav.target_choice_all.options[document.target_select_nav.target_choice_all.selectedIndex].value) style="width: 90px">
 		{% for complex in Target %}
@@ -102,8 +102,8 @@ padding-top: 60px;
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <form method='POST'>{% csrf_token %}
-            <table class="table">{{ form.as_table }}</table>
-            <input type="submit" value="Submit" /></form>
+            <table class="table" style="width:500px;border-collapse:separate;border-spacing:10px">{{ form.as_table }}
+            <tr><td></td><td><input type="submit" value="Submit" /></td></tr></table></form>
           </ul>
         </li>
 	<li><a href="{% url 'method' %}">Methods</a></li>

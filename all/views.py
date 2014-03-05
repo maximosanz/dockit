@@ -23,8 +23,7 @@ def target_info(request, name):
 
 def search(request):
 	#home/search page
-        context = {}
-	return insert_form_and_go(request,'all/search.html',context)
+	return insert_form_and_go(request,'all/search.html',{})
 
 def summary(request,target):
 	#summary page
@@ -124,7 +123,7 @@ def model(request, id):
 
 def method(request):
 	#summary table of docking methods
-	return insert_form_and_go(request, 'all/method.html')
+	return insert_form_and_go(request, 'all/method.html', {})
 
 def refinement(request):
 	#information on the effect of refinement
@@ -141,7 +140,7 @@ def refinement(request):
 
 def about(request):
 	#about page
-	return insert_form_and_go(request, 'all/about.html')
+	return insert_form_and_go(request, 'all/about.html', {})
 
 def insert_form_and_go(request,template,context):
 	#inserts the model select form onto every page and renders the page

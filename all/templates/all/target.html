@@ -1,76 +1,88 @@
 {% extends 'all/base.html' %}
 {% block title %}Targets{% endblock %}
-{% block content %}<h1 id="rigid">Targets</h1>
+{% block content %}
+
+<div class="page-header">
+<h1>Targets <small>Some text</small></h1>
+</div>
 
 <a href="#rigid">Rigid</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="#medium">Medium</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="#difficult">Difficult</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="{% url 'search' %}">Back to search</a>
+
 <h2>Rigid targets</h2>
 <table class="table">
 <tr>
-<th><div data-ot="PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-tipJoint="top" data-ot-targetJoint="bottom">PDB ID</div></th>
-<th><div data-ot="Category tooltip" data-ot-target=true data-ot-style="dark">Category</div></th>
-<!--<th><a style="color: inherit; text-decoration: inherit; cursor: pointer;">PDB ID</a></th>-->
-<!--<th><a style="color: inherit; text-decoration: inherit; cursor: pointer;">Category</a></th>-->
-<th>Receptor PDB ID</th>
-<th>Ligand PDB ID</th>
-<th>Receptor description</th>
-<th>Ligand description</th>
+<th><div data-ot="PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">PDB ID</div></th>
+<th><div data-ot="Category tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Category</div></th>
+<th><div data-ot="Receptor PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Receptor PDB ID</div></th>
+<th><div data-ot="Ligand PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Ligand PDB ID</div></th>
+<th><div data-ot="Receptor description" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Receptor description</div></th>
+<th><div data-ot="Ligand description" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Ligand description</div></th>
+<th></th>
 </tr>
 {% for complex in Rigid %}
 	<tr>
-	<td><a href="{% url 'target_info' complex.name %}">{{ complex.name }}</a></td>
+	<td><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
 	<td>{{ complex.category}}</td>
-	<td>{{ complex.receptor }}</td>
-	<td>{{ complex.ligand }}</td>	
+	<td><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
+	<td><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
 	<td>{{ complex.receptor_description }}</td>
 	<td>{{ complex.ligand_description }}</td>
+	<td><a href="{% url 'target_info' complex.name %}">View target</a></td>
 	</tr>
 {% endfor %}</table>
 <a id="medium" href="#">Back to top</a>
+
 <h2>Medium targets</h2>
 <table class="table">
 <tr>
-<th>PDB ID</th>
-<th>Category</th>
-<th>Receptor PDB ID</th>
-<th>Ligand PDB ID</th>
-<th>Receptor description</th>
-<th>Ligand description</th>
+<th><div data-ot="PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">PDB ID</div></th>
+<th><div data-ot="Category tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Category</div></th>
+<th><div data-ot="Receptor PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Receptor PDB ID</div></th>
+<th><div data-ot="Ligand PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Ligand PDB ID</div></th>
+<th><div data-ot="Receptor description" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Receptor description</div></th>
+<th><div data-ot="Ligand description" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Ligand description</div></th>
+<th></th>
 </tr>
 {% for complex in Medium %}
         <tr>
-	<td><a href="{% url 'target_info' complex.name %}">{{ complex.name }}</a></td>
-        <td>{{ complex.category}}</td>
-        <td>{{ complex.receptor }}</td>
-        <td>{{ complex.ligand }}</td>       
-        <td>{{ complex.receptor_description }}</td>
-        <td>{{ complex.ligand_description }}</td>
+	<td><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
+	<td>{{ complex.category}}</td>
+	<td><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
+	<td><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
+	<td>{{ complex.receptor_description }}</td>
+	<td>{{ complex.ligand_description }}</td>
+	<td><a href="{% url 'target_info' complex.name %}">View target</a></td>
 	</tr>
 {% endfor %}</table>
 <a id="difficult" href="#">Back to top</a>
+
 <h2>Difficult targets</h2>
 <table class="table">
 <tr>
-<th>PDB ID</th>
-<th>Category</th>
-<th>Receptor PDB ID</th>
-<th>Ligand PDB ID</th>
-<th>Receptor description</th>
-<th>Ligand description</th>
+<th><div data-ot="PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">PDB ID</div></th>
+<th><div data-ot="Category tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Category</div></th>
+<th><div data-ot="Receptor PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Receptor PDB ID</div></th>
+<th><div data-ot="Ligand PDB ID tooltip" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Ligand PDB ID</div></th>
+<th><div data-ot="Receptor description" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Receptor description</div></th>
+<th><div data-ot="Ligand description" data-ot-target=true data-ot-style="dark" data-ot-stem="false">Ligand description</div></th>
+<th></th>
 </tr>
 {% for complex in Difficult %}
         <tr>
-	<td><a href="{% url 'target_info' complex.name %}">{{ complex.name }}</a></td>
-        <td>{{ complex.category}}</td>
-        <td>{{ complex.receptor }}</td>
-        <td>{{ complex.ligand }}</td>       
-        <td>{{ complex.receptor_description }}</td>
-        <td>{{ complex.ligand_description }}</td>
+	<td><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
+	<td>{{ complex.category}}</td>
+	<td><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
+	<td><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
+	<td>{{ complex.receptor_description }}</td>
+	<td>{{ complex.ligand_description }}</td>
+	<td><a href="{% url 'target_info' complex.name %}">View target</a></td>
 	</tr>
 {% endfor %}
 </table>
+
 <a href="#">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="{% url 'search' %}">Back to search</a>
 {% endblock %}

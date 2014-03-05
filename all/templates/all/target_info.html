@@ -1,6 +1,10 @@
 {% extends 'all/base.html' %}{% block title %}{{ target.name }}{% endblock %}
 {% block content %}
-<h1>{{ target.name }} target details</h1>
+
+<div class="page-header">
+<h1>{{ target.name }} target details <small>Some text</small></h1>
+</div>
+
 <table class="table"><tr>
 <td>Difficulty</td>
 <td>{{ target.difficulty }}</td>

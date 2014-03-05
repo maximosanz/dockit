@@ -1,6 +1,12 @@
 {% extends 'all/base.html' %}{% block title %}Search{% endblock %}
 {% block content %}
-<h1>Target search</h1>
+
+<div class="jumbotron">
+<h1>Dockit</h1>
+<p>A database of protein-protein interaction models</p>
+</div>
+
+<h2>Target search</h2>
 
 <table class="table">
 <tr><td><a href="{% url 'target' %}">View all benchmarks</a></td><td></td></tr>
@@ -39,10 +45,10 @@
 
 <a href="{% url 'refinement' %}">View information on refinement</a>
 
-<h1>Model search</h1><form method='POST'>{% csrf_token %}
+<h2>Model search</h2><form method='POST'>{% csrf_token %}
 <table class="table">{{ form.as_table }}</table>
 <input type="submit" value="Submit" /></form>
-
+{{ request.test }}
 <script>
 function goTo(name) {
 	document.location.href=document.location.href+"target/"+name;

@@ -1,8 +1,11 @@
 {% extends 'all/base.html' %}{% block title %}{{ model.name }}{% endblock %}
 {% block content %}
-<h1>Model details</h1>
-<table class="table"><tr>
 
+<div class="page-header">
+<h1>Model details <small>Some text</small></h1>
+</div>
+
+<table class="table"><tr>
 <td>Complex</td>
 <td>{{ model.target.complex }}</td>
 </tr><tr>

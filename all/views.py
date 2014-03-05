@@ -10,8 +10,8 @@ import re
 
 def target(request):
 	#page with target table
-        context = {'Rigid':Target.objects.filter(difficulty='Rigid'),'Medium':Target.objects.filter(difficulty='Medium'),'Difficult':Target.objects.filter(difficulty='Difficult')}
-        return render(request, 'all/target.html', context)
+        context = {'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
+        return insert_form_and_go(request, 'all/target.html', context)
 
 def target_info(request, name):
 	#details on a particular target
@@ -19,30 +19,12 @@ def target_info(request, name):
 	interactions = extract_interactions('all/static/bench_contacts/'+target.name+'_caprifit-contacts.out',False)
 	#unbound interface residues and contacts inputted as empty to avoid drawing them (may change this)
         context = {'target':target,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':"",'inp_int_5A_residues':"",'inp_int_10A_residues':""}
-        return render(request, 'all/target_info.html', context)
+        return insert_form_and_go(request, 'all/target_info.html', context)
 
 def search(request):
 	#home/search page
-        if request.method == 'GET':
-                form = model_select_form()
-        else:
-                form = model_select_form(request.POST)
-                if form.is_valid():
-                        target = form.cleaned_data['target']
-                        method = form.cleaned_data['method']
-			refinement = form.cleaned_data['refinement']
-			i_rmsd_t = str(form.cleaned_data['i_rmsd_threshold'])
-			i_rmsd_threshold = re.sub('\.', '-', i_rmsd_t)
-			l_rmsd_t = str(form.cleaned_data['l_rmsd_threshold'])
-			l_rmsd_threshold = re.sub('\.', '-', l_rmsd_t)
-			r_rmsd_t = str(form.cleaned_data['r_rmsd_threshold'])
-			r_rmsd_threshold = re.sub('\.', '-', r_rmsd_t)
-			fnat_t = str(form.cleaned_data['fnat_threshold'])
-			fnat_threshold = re.sub('\.', '-', fnat_t)
-
-                        return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold}))
-        context = {'Target':Target.objects.all(),'Rigid':Target.objects.filter(difficulty='Rigid'),'Medium':Target.objects.filter(difficulty='Medium'),'Difficult':Target.objects.filter(difficulty='Difficult'),'form':form}
-        return render(request,'all/search.html',context)
+        context = {}
+	return insert_form_and_go(request,'all/search.html',context)
 
 def summary(request,target):
 	#summary page
@@ -106,7 +88,7 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 		results = results.filter(refinement__name=refinement)
 
 	context = {'results':results}
-	return render(request, 'all/model_select.html', context)
+	return insert_form_and_go(request, 'all/model_select.html', context)
 
 def scoring(request, scorer, target):
 	#comparison of scoring functions
@@ -126,7 +108,7 @@ def scoring(request, scorer, target):
 			print('error')
 
 	context = {'target_names':Target.objects.values_list('name',flat=True),'scorer_names':ScoringFunction.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'target_choice':target,'scorer_choice':scorer,'model_irmsds':model_irmsds,'scores':scores,'model_ids':model_ids,'model_methods':model_methods}
-	return render(request, 'all/scoring.html', context)
+	return insert_form_and_go(request, 'all/scoring.html', context)
 
 def model(request, id):
 	#details on a particular model
@@ -138,11 +120,11 @@ def model(request, id):
 
 	interactions = extract_interactions('all/static/1ZM4_cluspro-balanced_nothing_1_caprifit-contacts.out',True)
         context = {'model':model,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues']}
-        return render(request, 'all/model.html', context)
+        return insert_form_and_go(request, 'all/model.html', context)
 
 def method(request):
 	#summary table of docking methods
-	return render(request, 'all/method.html')
+	return insert_form_and_go(request, 'all/method.html')
 
 def refinement(request):
 	#information on the effect of refinement
@@ -155,11 +137,37 @@ def refinement(request):
 		improvements.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='FiberDock').i_rmsd - Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='Nothing').i_rmsd)
 		ref_model_ids.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='FiberDock').id)
 	context = {'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids}
-	return render(request, 'all/refinement.html', context)
+	return insert_form_and_go(request, 'all/refinement.html', context)
 
+def about(request):
+	#about page
+	return insert_form_and_go(request, 'all/about.html')
 
-
-
+def insert_form_and_go(request,template,context):
+	#inserts the model select form onto every page and renders the page
+	if request.method == 'GET':
+		form = model_select_form()
+	else:
+		form = model_select_form(request.POST)
+		if form.is_valid():
+		        target = form.cleaned_data['target']
+		        method = form.cleaned_data['method']
+			refinement = form.cleaned_data['refinement']
+			i_rmsd_t = str(form.cleaned_data['i_rmsd_threshold'])
+			i_rmsd_threshold = re.sub('\.', '-', i_rmsd_t)
+			l_rmsd_t = str(form.cleaned_data['l_rmsd_threshold'])
+			l_rmsd_threshold = re.sub('\.', '-', l_rmsd_t)
+			r_rmsd_t = str(form.cleaned_data['r_rmsd_threshold'])
+			r_rmsd_threshold = re.sub('\.', '-', r_rmsd_t)
+			fnat_t = str(form.cleaned_data['fnat_threshold'])
+			fnat_threshold = re.sub('\.', '-', fnat_t)
+			return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold}))
+	context['Target'] = Target.objects.all()
+	context['Rigid'] = Target.objects.filter(difficulty='Rigid')
+	context['Medium'] = Target.objects.filter(difficulty='Medium')
+	context['Difficult'] = Target.objects.filter(difficulty='Difficult')
+	context['form'] = form
+	return render(request, template, context)
 
 
 

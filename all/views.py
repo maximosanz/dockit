@@ -140,9 +140,17 @@ def model(request, id):
         context = {'model':model,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues']}
         return render(request, 'all/model.html', context)
 
+def target_models(request, name):
+	#table with info and JSmol display of all models produced for a target
+	target = Target.objects.get(name=name)
+	context = {'target':target}
+	return render(request, 'all/target_models.html', context)
+	
+
 def method(request):
 	#summary table of docking methods
 	return render(request, 'all/method.html')
+
 
 def refinement(request):
 	#information on the effect of refinement

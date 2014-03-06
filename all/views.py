@@ -125,17 +125,17 @@ def method(request):
 	#summary table of docking methods
 	return insert_form_and_go(request, 'all/method.html', {})
 
-def refinement(request):
+def refinement(request,method,refinement,target):
 	#information on the effect of refinement
 	#for the minute constructs a graph for ZDock v ZDock/FiberDock performance for one target
 	no_ref_irmsds = []
 	improvements = []
 	ref_model_ids = []
 	for i in range(500):
-		no_ref_irmsds.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='Nothing').i_rmsd)
-		improvements.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='FiberDock').i_rmsd - Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='Nothing').i_rmsd)
-		ref_model_ids.append(Model.objects.get(target__name='1ACB',method__name='ZDOCK',number=i+1,refinement__name='FiberDock').id)
-	context = {'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids}
+		no_ref_irmsds.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd)
+		improvements.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd - Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='Nothing').i_rmsd)
+		ref_model_ids.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).id)
+	context = {'method':method,'refinement':refinement,'target':target,'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids,'target_names':Target.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'refinement_names':Refinement.objects.values_list('name',flat=True)}
 	return insert_form_and_go(request, 'all/refinement.html', context)
 
 def about(request):

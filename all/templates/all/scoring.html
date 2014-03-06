@@ -18,15 +18,13 @@ Choose a scoring method:&nbsp;&nbsp;<select name="scoring_method" style="width: 
 <option value={{ each_scorer }}>{{ each_scorer }}</option>
 {% endfor %}
 </select>
-<button onClick='change_graph(document.scoring_graph_choices.target_choice_all.options[document.scoring_graph_choices.target_choice_all.selectedIndex].value,document.scoring_graph_choices.scoring_method.options[document.scoring_graph_choices.scoring_method.selectedIndex].value)'>Update</button>
+<button type="button" onClick='change_graph(document.scoring_graph_choices.target_choice_all.options[document.scoring_graph_choices.target_choice_all.selectedIndex].value,document.scoring_graph_choices.scoring_method.options[document.scoring_graph_choices.scoring_method.selectedIndex].value)'>Update</button>
 </form>
 
 <script>
 //change scoring graph when options are changed
 function change_graph(target,scorer) {
-//document.location.href="/scoring_"+scorer+"_"+target;
-//document.location.href="{% url 'scoring' 'scorer' 'target' %}".replace("scorer", scorer).replace("target",target);
-document.location.href="{% url 'scoring' '1SYX' 'ZRANK2' %}"
+document.location.href="/scoring_"+scorer+"_"+target;
 }
 
 var model_irmsds = [{% for a in model_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];

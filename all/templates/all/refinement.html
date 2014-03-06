@@ -8,6 +8,11 @@
 <div id="refinement_graph" style="width:100%; height:600px;"></div>
 
 <script>
+//change refinement graph when options are changed
+function change_graph(target,method,refinement) {
+document.location.href="/refinement_"+method+"_"+refinement+"_"+target;
+}
+
 var no_ref_irmsds = [{% for a in no_ref_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var improvements = [{% for b in improvements %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var ref_model_ids = [{% for c in ref_model_ids %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
@@ -20,10 +25,9 @@ data_series.push({'x':parseFloat(no_ref_irmsds[i]),'y':parseFloat(improvements[i
 $(function () {
 	$('#refinement_graph').highcharts({
 	chart: {
-		type: 'scatter'
 	},
 	title: {
-		text: 'Improvement of I-RMSD on refinement'
+		text: 'Improvement in I-RMSD of {{ method }} models on {{ refinement }} refinement for {{ target }}'
 	},
 	legend : {
 		enabled: false
@@ -35,7 +39,7 @@ $(function () {
 	},
 	yAxis: {
 		title: {
-			text: 'Change in I-RMSD on refinement'
+			text: 'Change in I-RMSD on {{ refinement }} refinement'
 		}
 	},
 	plotOptions: {
@@ -62,11 +66,37 @@ $(function () {
 		}
 	},*/
 	series: [{
-		data: data_series
+		type: 'scatter',
+		data: data_series,
+		marker : {
+			symbol: 'circle',
+			radius: 2
+		}}, {
+		type: 'line',
+		data: [[0,0],[20,0]]
 	}]
 	});
 });
 </script>
+
+<form name="refinement_graph_choices" action="">
+Choose a target:&nbsp;&nbsp;<select name="target_choice_all" style="width: 90px">
+{% for each_target in target_names %}
+<option value={{ each_target }}>{{ each_target }}</option>
+{% endfor %}
+</select>
+Choose a docking method:&nbsp;&nbsp;<select name="docking_method">
+{% for each_method in method_names %}
+<option value={{ each_method }}>{{ each_method }}</option>
+{% endfor %}
+</select>
+Choose a refinement method:&nbsp;&nbsp;<select name="refinement_method">
+{% for each_refinement in refinement_names %}
+<option value={{ each_refinement }}>{{ each_refinement }}</option>
+{% endfor %}
+</select>
+<button type="button" onClick='change_graph(document.refinement_graph_choices.target_choice_all.options[document.refinement_graph_choices.target_choice_all.selectedIndex].value,document.refinement_graph_choices.docking_method.options[document.refinement_graph_choices.docking_method.selectedIndex].value,document.refinement_graph_choices.refinement_method.options[document.refinement_graph_choices.refinement_method.selectedIndex].value)'>Update</button>
+</form>
 
 <a href="{% url 'search' %}">Back to start</a>
 {% endblock %}

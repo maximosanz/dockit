@@ -11,6 +11,6 @@ urlpatterns = patterns('',
     url(r'^model_(?P<id>\w+)', views.model, name='model'),
     url(r'^scoring_(?P<scorer>\w+)_(?P<target>\w+)/$', views.scoring, name='scoring'),
     url(r'^method/$', views.method, name='method'),
-    url(r'^refinement/$', views.refinement, name='refinement'),
+    url(r'^refinement_(?P<method>\w+)_(?P<refinement>\w+)_(?P<target>\w+)/$', views.refinement, name='refinement'),
     url(r'^about/$', views.about, name='about'),
 )

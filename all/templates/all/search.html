@@ -44,12 +44,12 @@
 
 <a href="{% url 'scoring' 'PISA' '1BGX' %}">View summary of scoring functions</a><br><br>
 
-<a href="{% url 'refinement' %}">View information on refinement</a>
+<a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' %}">View information on refinement</a>
 
 <h2>Model search</h2><form method='POST'>{% csrf_token %}
 <table class="table">{{ form.as_table }}</table>
 <input type="submit" value="Submit" /></form>
-{{ request.test }}
+
 <script>
 function goTo(name) {
 	document.location.href=document.location.href+"target/"+name;

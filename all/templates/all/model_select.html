@@ -1,5 +1,6 @@
 {% extends 'all/base.html' %}{% block title %}Model select{% endblock %}
 {% block content %}
+{% load static from staticfiles %}
 
 <h1>Model search results</h1>
 
@@ -61,11 +62,11 @@
 <table id="model_select_table" class="tablesorter"></table>
 <div id="ts-pager" class="ts-pager">
   <form>
-    <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
-    <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
+    <img src="{% static "tablesorter/addons/pager/icons/first.png" %}" class="first"/>
+    <img src="{% static "tablesorter/addons/pager/icons/prev.png" %}" class="prev"/>
     <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
-    <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
-    <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
+    <img src="{% static "tablesorter/addons/pager/icons/next.png" %}" class="next"/>
+    <img src="{% static "tablesorter/addons/pager/icons/last.png" %}" class="last"/>
     <select class="pagesize">
       <option selected="selected" value="10">10</option>
       <option value="20">20</option>

@@ -1,5 +1,6 @@
 {% extends 'all/base.html' %}{% block title %}{{ target.name }}{% endblock %}
 {% block content %}
+{% load static from staticfiles %}
 
 <div class="page-header">
 <h1>{{ target.name }} target details <small>Some text</small></h1>
@@ -31,7 +32,8 @@
 var vis_array = [true,true,false,false];
 
 //initial commands to set up
-var input = "background black; load FILES \"/static/benchmarks/{{ target.name }}_r_b.pdb\" \"/static/benchmarks/{{ target.name }}_l_b.pdb\" \"/static/benchmarks/{{ target.name }}_r_u_cleanedup.pdb\" \"/static/benchmarks/{{ target.name }}_l_u_cleanedup.pdb\"; CARTOON only; frame ALL;";
+var file_names = ["{% static file_names.rb %}","{% static file_names.lb %}","{% static file_names.ru %}","{% static file_names.lu %}"];
+var input = "background black; load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\" \""+file_names[3]+"\"; CARTOON only; frame ALL;";
 input += "select */1; color translucent 0.7 "+rec_colours[0]+";";
 input += "select */2; color translucent 0.7 "+lig_colours[0]+";";
 input += "select */3; color translucent 0.7 "+rec_colours[1]+";";

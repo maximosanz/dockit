@@ -1,10 +1,11 @@
 {% extends 'all/base.html' %}{% block title %}Search{% endblock %}
 {% block content %}
+{% load static from staticfiles %}
 
 <div class="jumbotron" style="background-color:white;"><table><tr><td>
 <h1>Dockit</h1>
 <p>A database of protein-protein interaction models</p></td>
-<td align="center" style="width:500px;"><img src="static/image.png" width="300px">
+<td align="center" style="width:500px;"><img src="{% static "image.png" %}" width="300px">
 </td></tr></table></div>
 
 <h2>Target search</h2>

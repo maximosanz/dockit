@@ -6,6 +6,7 @@ from all.models import Target, Method, Model, Refinement, ScoringFunction, Score
 from django.core.urlresolvers import reverse
 from all.forms import model_select_form
 from all.extract import extract_interactions
+from django.contrib.staticfiles.templatetags.staticfiles import static
 import re
 
 def target(request):
@@ -16,9 +17,12 @@ def target(request):
 def target_info(request, name):
 	#details on a particular target
 	target = Target.objects.get(name=name)
-	interactions = extract_interactions('all/static/bench_contacts/'+target.name+'_caprifit-contacts.out',False)
+	#need to change from absolute filepath
+	interactions = extract_interactions('/project/data/dockit/static/bench_contacts/'+target.name+'_caprifit-contacts.out',False)
+	#interactions = extract_interactions(static('bench_contacts/'+target.name+'_caprifit-contacts.out'),False)
+	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','ru':'benchmarks/'+target.name+'_r_u_cleanedup.pdb','lu':'benchmarks/'+target.name+'_l_u_cleanedup.pdb'}
 	#unbound interface residues and contacts inputted as empty to avoid drawing them (may change this)
-        context = {'target':target,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':"",'inp_int_5A_residues':"",'inp_int_10A_residues':""}
+        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':"",'inp_int_5A_residues':"",'inp_int_10A_residues':""}
         return insert_form_and_go(request, 'all/target_info.html', context)
 
 def search(request):
@@ -112,13 +116,16 @@ def scoring(request, scorer, target):
 def model(request, id):
 	#details on a particular model
         model = Model.objects.get(id=id)
+	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','model':''}
+	#file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','model':'results/'+model.method.name+'/'+model.refinement.name+'/'+model.target.difficulty+'/'+target.name+'/'+target.name+'_'+model.method.name+'_'+model.refinement.name+'_'+model.number+'.pdb-'+model.target.receptor_bound_chain+'-fitted}
 
 	#get chain information to allow visualisation of receptor/ligand separately
 	model_rec_chains = "*:"+"/3.1 or *:".join(list(model.target.receptor_bound_chain))+"/3.1"
 	model_lig_chains = "*:"+"/3.1 or *:".join(list(model.target.ligand_bound_chain))+"/3.1"
 
+	#needs changing, from absolute filepath and to choose relevant file
 	interactions = extract_interactions('all/static/1ZM4_cluspro-balanced_nothing_1_caprifit-contacts.out',True)
-        context = {'model':model,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues']}
+        context = {'model':model,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues']}
         return insert_form_and_go(request, 'all/model.html', context)
 
 def target_models(request, name):

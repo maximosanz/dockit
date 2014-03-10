@@ -1,0 +1,128 @@
+{% extends 'all/base.html' %}{% block title %}{{ target.name }} Models{% endblock %}
+{% block content %}
+<h1>{{ target.name }} models</h1>
+
+<p><a href="{% url 'target_info' target.name %}">View target details</a></p>
+
+<b>Show columns:</b>
+<form id="columnselector">
+<input type="checkbox" id="method.name" name="Method" onclick="refreshtable();" checked>Method&nbsp
+<input type="checkbox" id="refinement.name" name="Refinement" onclick="refreshtable();" checked>Refinement&nbsp
+<input type="checkbox" id="i_rmsd" name="I-RMSD" onclick="refreshtable();" checked>I-RMSD&nbsp
+<input type="checkbox" id="l_rmsd" name="L-RMSD" onclick="refreshtable();" checked>L-RMSD&nbsp
+<input type="checkbox" id="r_rmsd" name="R-RMSD" onclick="refreshtable();" checked>R-RMSD&nbsp
+<input type="checkbox" id="fnat" name="Fnat" onclick="refreshtable();" checked>Fnat&nbsp
+<input type="checkbox" id="i_l_rmsd" name="I-L-RMSD" onclick="refreshtable();" >I-L-RMSD&nbsp
+</form>
+<br>
+
+<table id="target_models_template" class="table" style='display:none;'>
+<thead>
+<tr>
+<th class="filter-false sorter-false th.selectmodel">Select</th>
+<th class="filter-select th.method.name">Method</th>
+<th class="filter-select th.refinement.name">Refinement</th>
+<th class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
+<th class="th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th class="th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th class="th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th class="th.i_l_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+</tr>
+
+</thead>
+<tbody>
+{% for model in results %}
+<tr class="bodytr" name="{{ model.id }}">
+<td class="td.modelcheckbox" style='width:40px' checked='unchecked'><center><input name="{{ model.id }}box" class="modelcheckbox" type="checkbox"></center></td>
+<td class="td.method.name" style='width:160px'>{{ model.method.name }}</td>
+<td class="td.refinement.name" style='width:135px'>{{ model.refinement.name }}</td>
+<td class="td.i_rmsd">{{ model.i_rmsd }}</td>
+<td class="td.l_rmsd">{{ model.l_rmsd }}</td>
+<td class="td.r_rmsd">{{ model.r_rmsd }}</td>
+<td class="td.fnat" style='width:100px'>{{ model.fnat }}</td>
+<td class="td.i_l_rmsd">{{ model.i_l_rmsd }}</td>
+<td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}">View model</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<table id="target_models_table" class="tablesorter"></table>
+<div id="ts-pager" class="ts-pager">
+  <form>
+    <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
+    <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
+    <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+    <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
+    <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
+    <select class="pagesize">
+      <option selected="selected" value="10">10</option>
+      <option value="20">20</option>
+      <option value="30">30</option>
+      <option value="40">40</option>
+    </select>
+  </form>
+</div>
+<br>
+<input type="submit" value="Deselect all models" onclick="deselectmodels();"><br>
+<a href="{% url 'search' %}">Back to search</a>
+
+<script>
+function deselectmodels(){
+    $('#target_models_table .modelcheckbox').prop('checked', false);
+    $('#target_models_table .modelcheckbox').removeAttr('checked');
+}
+</script>
+
+<script>
+
+function refreshtable(){
+    var th='.th\\.';
+    var td='.td\\.';
+    var template=document.getElementById('target_models_template');
+    var tbl=document.getElementById('target_models_table');
+    var intable=template.innerHTML;
+    var ch = new Array();
+    $('#target_models_table [checked="checked"]').each(function() {
+	boxid=this.getAttribute('name');
+	ch.push(boxid);
+    });
+    tbl.innerHTML = intable;
+    var form=document.getElementById('columnselector');
+    var columns=form.getElementsByTagName('input');
+    for(var i=0; i<columns.length; i++) {
+	if (!columns[i].checked) {
+            var rawid=columns[i].id;
+            var id = rawid.replace(".", "\\.");
+            var headerclass=th+id;
+            var cellclass=td+id;
+            $('#target_models_table ' + headerclass).remove();
+            $('#target_models_table ' + cellclass).remove();
+	}
+    }
+    $('#target_models_table .modelcheckbox').click(function(){
+	if (this.checked) {
+            this.setAttribute('checked','checked');
+	}
+	if (!this.checked) {
+            this.removeAttribute('checked');
+	}
+    });
+    for(var k=0; k<ch.length; k++) {
+	var selectedmodel=ch[k];
+	$('#target_models_table [name="'+selectedmodel+'"]').prop('checked',true);
+	$('#target_models_table [name="'+selectedmodel+'"]').attr('checked','checked');
+    }
+
+    $('.tablesorter').trigger("updateAll");
+
+}
+
+</script>
+
+<script>
+$(document).ready(refreshtable());
+</script>
+
+{% endblock %}
+
+

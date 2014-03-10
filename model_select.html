@@ -1,0 +1,110 @@
+{% extends 'all/base.html' %}{% block title %}Model select{% endblock %}
+{% block content %}
+
+<h1>Model search results</h1>
+
+<b>Show columns:</b>
+<form id="columnselector">
+<input type="checkbox" id="target.name" name="Target" onclick="refreshtable();" checked>Target&nbsp
+<input type="checkbox" id="target.difficulty" name="Difficulty" onclick="refreshtable();" checked>Difficulty&nbsp
+<input type="checkbox" id="method.name" name="Method" onclick="refreshtable();" checked>Method&nbsp
+<input type="checkbox" id="refinement.name" name="Refinement" onclick="refreshtable();" checked>Refinement&nbsp
+<input type="checkbox" id="i_rmsd" name="I-RMSD" onclick="refreshtable();" checked>I-RMSD&nbsp
+<input type="checkbox" id="l_rmsd" name="L-RMSD" onclick="refreshtable();" checked>L-RMSD&nbsp
+<input type="checkbox" id="r_rmsd" name="R-RMSD" onclick="refreshtable();" checked>R-RMSD&nbsp
+<input type="checkbox" id="fnat" name="Fnat" onclick="refreshtable();" checked>Fnat&nbsp
+<input type="checkbox" id="i_l_rmsd" name="I-L-RMSD" onclick="refreshtable();" >I-L-RMSD&nbsp
+<input type="checkbox" id="target.receptor" name="Receptor_PDB_ID" onclick="refreshtable();" >Receptor PDB ID
+<input type="checkbox" id="target.ligand" name="Ligand_PDB_ID" onclick="refreshtable();" >Ligand PDB ID
+</form>
+<br>
+
+<table id="model_select_template" class="table" style='display:none;'>
+<thead>
+<tr>
+<!--<th class="filter-false">Select</th>-->
+<th class="th.target.name" data-placeholder="e.g. '1ACB'">Target</th>
+<th class="th.target.difficulty" data-placeholder="e.g. 'Rigid'">Difficulty</th>
+<th class="th.method.name" data-placeholder="e.g. 'ZDOCK or Hex'">Method</th>
+<th class="th.refinement.name" data-placeholder="e.g. '!Nothing'">Refinement</th>
+<th class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
+<th class="th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th class="th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th class="th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th class="th.i_l_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th class="th.target.receptor" data-placeholder="e.g. '1BVL'">Receptor PDB ID</th>
+<th class="th.target.ligand" data-placeholder="e.g. '3LZT'">Ligand PDB ID</th>
+</tr>
+
+</thead>
+<tbody>
+{% for model in results %}
+<tr class="bodytr">
+<!-- <td><input type="checkbox"></td>-->
+<td class="td.target.name" style='width:110px'><a href="{% url 'target_info' model.target.name %}">{{ model.target.name }}</a></td>
+<td class="td.target.difficulty">{{ model.target.difficulty }}</td>
+<td class="td.method.name" style='width:160px'>{{ model.method.name }}</td>
+<td class="td.refinement.name" style='width:135px'>{{ model.refinement.name }}</td>
+<td class="td.i_rmsd">{{ model.i_rmsd }}</td>
+<td class="td.l_rmsd">{{ model.l_rmsd }}</td>
+<td class="td.r_rmsd">{{ model.r_rmsd }}</td>
+<td class="td.fnat" style='width:100px'>{{ model.fnat }}</td>
+<td class="td.i_l_rmsd">{{ model.i_l_rmsd }}</td>
+<td class="td.target.receptor"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target.receptor }}">{{ model.target.receptor }}</a></td>
+<td class="td.target.ligand"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target.ligand }}">{{ model.target.ligand }}</a></td>
+<td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}">View model</a></td>
+<td class="td.viewallmodels" style='width:180px'><a href="{% url 'target_models' model.target.name 'All' 'All' 0 0 0 0 %}">View all models for {{model.target.name}}</a></td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<table id="model_select_table" class="tablesorter"></table>
+<div id="ts-pager" class="ts-pager">
+  <form>
+    <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
+    <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
+    <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+    <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
+    <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
+    <select class="pagesize">
+      <option selected="selected" value="10">10</option>
+      <option value="20">20</option>
+      <option value="30">30</option>
+      <option value="40">40</option>
+    </select>
+  </form>
+</div>
+<br>
+<a href="{% url 'search' %}">Back to search</a>
+
+<script>
+
+function refreshtable(){
+    var th='.th\\.';
+    var td='.td\\.';
+    var template=document.getElementById('model_select_template');
+    var tbl=document.getElementById('model_select_table');
+    var intable=template.innerHTML;
+    tbl.innerHTML = intable;
+    var form=document.getElementById('columnselector');
+    var columns=form.getElementsByTagName('input');
+    for(var i=0; i<columns.length; i++) {
+	if (!columns[i].checked) {
+            var rawid=columns[i].id;
+            var id = rawid.replace(".", "\\.");
+            var headerclass=th+id;
+            var cellclass=td+id;
+            $('#model_select_table ' + headerclass).remove();
+            $('#model_select_table ' + cellclass).remove();
+}
+    }
+$('.tablesorter').trigger("updateAll");
+}
+
+</script>
+
+<script>
+$( document ).ready(refreshtable() );
+</script>
+
+{% endblock %}

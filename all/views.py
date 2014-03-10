@@ -91,7 +91,10 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 		results = results.filter(refinement__name=refinement)
 
 	context = {'results':results}
-	return insert_form_and_go(request, 'all/model_select.html', context)
+	if target not in ['All', 'Rigid', 'Medium', 'Difficult']:
+		return HttpResponseRedirect(reverse('target_models',kwargs={'name':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold}))
+	else:
+		return insert_form_and_go(request, 'all/model_select.html', context)
 
 def scoring(request, scorer, target):
 	#comparison of scoring functions
@@ -138,10 +141,27 @@ def model(request, id):
         context = {'model':model,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score}
         return insert_form_and_go(request, 'all/model.html', context)
 
-def target_models(request, name):
+def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold):
 	#table with info and JSmol display of all models produced for a target
+	i_rmsd_threshold = float(re.sub('-', '.', i_rmsd_threshold))
+	l_rmsd_threshold = float(re.sub('-', '.', l_rmsd_threshold))
+	r_rmsd_threshold = float(re.sub('-', '.', r_rmsd_threshold))
+	fnat_threshold = float(re.sub('-', '.', fnat_threshold))
 	target = Target.objects.get(name=name)
-	context = {'target':target}
+	results = Model.objects.filter(target__name=name)
+	if i_rmsd_threshold != 0:
+		results = results.filter(i_rmsd__lte=i_rmsd_threshold)
+	if l_rmsd_threshold != 0:
+		results = results.filter(l_rmsd__lte=l_rmsd_threshold)
+	if r_rmsd_threshold != 0:
+		results = results.filter(r_rmsd__lte=r_rmsd_threshold)
+	if fnat_threshold != 0:
+		results = results.filter(fnat__gte=fnat_threshold)
+	if method != 'All':
+		results = results.filter(method__name=method)
+	if refinement != 'All':
+		results = results.filter(refinement__name=refinement)
+	context = {'target':target, 'results':results}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	
 

@@ -6,6 +6,8 @@
 <h1>{{ target.name }} target details <small>Some text</small></h1>
 </div>
 
+<a href="{% url 'target_models' target.name %}">View models for this target</a><br>
+
 <table class="table"><tr>
 <td>Difficulty</td>
 <td>{{ target.difficulty }}</td>

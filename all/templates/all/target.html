@@ -25,13 +25,13 @@
 </tr>
 {% for complex in Rigid %}
 	<tr>
-	<td><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
+	<td style="width: 100px"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
 	<td>{{ complex.category}}</td>
-	<td><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
-	<td><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
+	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
+	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
 	<td>{{ complex.receptor_description }}</td>
 	<td>{{ complex.ligand_description }}</td>
-	<td><a href="{% url 'target_info' complex.name %}">View target</a></td>
+	<td style="width: 100px"><a href="{% url 'target_info' complex.name %}">View target</a></td>
 	</tr>
 {% endfor %}</table>
 <a id="medium" href="#">Back to top</a>
@@ -49,13 +49,13 @@
 </tr>
 {% for complex in Medium %}
         <tr>
-	<td><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
+	<td style="width: 100px"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
 	<td>{{ complex.category}}</td>
-	<td><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
-	<td><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
+	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
+	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
 	<td>{{ complex.receptor_description }}</td>
 	<td>{{ complex.ligand_description }}</td>
-	<td><a href="{% url 'target_info' complex.name %}">View target</a></td>
+	<td style="width: 100px"><a href="{% url 'target_info' complex.name %}">View target</a></td>
 	</tr>
 {% endfor %}</table>
 <a id="difficult" href="#">Back to top</a>
@@ -73,13 +73,13 @@
 </tr>
 {% for complex in Difficult %}
         <tr>
-	<td><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
+	<td style="width: 100px"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></td>
 	<td>{{ complex.category}}</td>
-	<td><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
-	<td><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
+	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></td>
+	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></td>	
 	<td>{{ complex.receptor_description }}</td>
 	<td>{{ complex.ligand_description }}</td>
-	<td><a href="{% url 'target_info' complex.name %}">View target</a></td>
+	<td style="width: 100px"><a href="{% url 'target_info' complex.name %}">View target</a></td>
 	</tr>
 {% endfor %}
 </table>

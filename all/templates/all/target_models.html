@@ -126,10 +126,20 @@ function refreshtable(){
 //jsmol scripts will go here
 //create JSMol window
 jmolApplet0 = Jmol.getApplet("jmolApplet0", info);
-Jmol.script(jmolApplet0,input);
+Jmol.script(jmolApplet0,"background black;");
 
 function re_render() {
-
+//possibly breaks if only one file selected
+//need to unload files first?
+models_selected = []
+var receptor = "{% static 'benchmarks/'+target+'_r_b.pdb' %}";
+//var load_files = "load FILES \""+receptor+"\"";
+var load_files = "load \""+receptor+"\"";
+for (var i=0; i<models_selected.length; i++) {
+load_files += " \""+models_selected[i]+"\"";
+}
+load_files += "; CARTOON only; frame ALL;";
+//Jmol.script(jmolApplet0,load_files);
 }
 </script>
 </td><td>

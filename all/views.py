@@ -116,16 +116,26 @@ def scoring(request, scorer, target):
 def model(request, id):
 	#details on a particular model
         model = Model.objects.get(id=id)
-	#file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','model':''}
 	file_names = {'rb':'benchmarks/'+model.target.name+'_r_b.pdb','lb':'benchmarks/'+model.target.name+'_l_b.pdb','model':'results/'+model.method.name.lower()+'/'+model.refinement.name.lower()+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+model.refinement.name.lower()+'_'+str(model.number)+'.pdb-'+model.target.receptor_bound_chain+'-fitted'}
 
 	#get chain information to allow visualisation of receptor/ligand separately
 	model_rec_chains = "*:"+"/3.1 or *:".join(list(model.target.receptor_bound_chain))+"/3.1"
 	model_lig_chains = "*:"+"/3.1 or *:".join(list(model.target.ligand_bound_chain))+"/3.1"
 
-	#needs changing, from absolute filepath and to choose relevant file
+	#needs changing from absolute filepath
 	interactions = extract_interactions('/project/data/dockit/static/results/'+model.method.name.lower()+'/'+model.refinement.name.lower()+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+model.refinement.name.lower()+'_'+str(model.number)+'_caprifit-contacts.out',True)
-        context = {'model':model,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues']}
+
+	def get_score(scorer):
+		if (len(Score.objects.filter(model__id=id,scoring_function__name=scorer)) > 0):
+			return Score.objects.get(model__id=id,scoring_function__name=scorer).score
+		else:
+			return '-'
+
+	zrank_score = get_score('ZRANK')
+	zrank2_score = get_score('ZRANK2')
+	pisa_score = get_score('PISA')
+
+        context = {'model':model,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score}
         return insert_form_and_go(request, 'all/model.html', context)
 
 def target_models(request, name):

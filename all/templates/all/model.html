@@ -44,17 +44,21 @@
 </tr><tr>
 
 <td>ZRANK score</td>
-<td></td>
+<td>{{ zrank_score }}</td>
+</tr><tr>
+
+<td>ZRANK2 score</td>
+<td>{{ zrank2_score }}</td>
 </tr><tr>
 
 <td>PISA score</td>
-<td></td>
+<td>{{ pisa_score }}</td>
 </tr></table>
 
 <table name="layout_table"><tr><td>
 <script>
 //visibility of native_rec, native_lig , model_rec, model_lig
-var vis_array = [false,false,true,true];
+var vis_array = [true,true,true,true];
 
 var ref_int_5A_residues = "{{ ref_int_5A_residues }}";
 var ref_int_10A_residues = "{{ ref_int_10A_residues }}";
@@ -69,7 +73,8 @@ input += "select */1; color translucent 0.7 "+rec_colours[0]+";";
 input += "select */2; color translucent 0.7 "+lig_colours[0]+";";
 input += "select {"+"{{ model_rec_chains }}"+"}; color translucent 0.7 "+rec_colours[1]+";";
 input += "select {"+"{{ model_lig_chains }}"+"}; color translucent 0.7 "+lig_colours[1]+";";
-input += "color {"+ref_int_10A_residues+"} OPAQUE; select all; display {"+"{{ model_rec_chains }} or {{ model_lig_chains }}"+"};";
+//input += "color {"+ref_int_10A_residues+"} OPAQUE; select all; display {"+"{{ model_rec_chains }} or {{ model_lig_chains }}"+"};";
+input += "color {"+ref_int_10A_residues+"} OPAQUE; select all; display all;";
 input += "{{ ref_draw_5A_contacts }} {{ inp_draw_5A_contacts }} draw OFF;";
 //create JSMol window
 jmolApplet0 = Jmol.getApplet("jmolApplet0", info);
@@ -104,12 +109,12 @@ Receptor chains in bound structure:<br>
 <script>
 document.write("{{ model.target.receptor_bound_chain }} - "+rec_colours[0]);
 </script>
-<br><a id="toggle_1" onClick='toggle_visible(1)' style="cursor: pointer">Show</a>
+<br><a id="toggle_1" onClick='toggle_visible(1)' style="cursor: pointer">Hide</a>
 <br><br>Ligand chains in bound structure:<br>
 <script>
 document.write("{{ model.target.ligand_bound_chain }} - "+lig_colours[0]);
 </script>
-<br><a id="toggle_2" onClick='toggle_visible(2)' style="cursor: pointer">Show</a>
+<br><a id="toggle_2" onClick='toggle_visible(2)' style="cursor: pointer">Hide</a>
 <br><br>Receptor chains in unbound structure:<br>
 <script>
 document.write("{{ model.target.receptor_bound_chain }} - "+rec_colours[1]);

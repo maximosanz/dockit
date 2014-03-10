@@ -53,7 +53,7 @@
 <td class="td.target.receptor"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target.receptor }}">{{ model.target.receptor }}</a></td>
 <td class="td.target.ligand"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target.ligand }}">{{ model.target.ligand }}</a></td>
 <td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}">View model</a></td>
-<td class="td.viewallmodels" style='width:180px'><a href="{% url 'target_models' model.target.name %}">View all models for {{model.target.name}}</a></td>
+<td class="td.viewallmodels" style='width:180px'><a href="{% url 'target_models' model.target.name 'All' 'All' 0 0 0 0 %}">View all models for {{model.target.name}}</a></td>
 </tr>
 {% endfor %}
 </tbody>

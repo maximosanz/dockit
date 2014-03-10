@@ -19,9 +19,9 @@
 <table id="target_models_template" class="table" style='display:none;'>
 <thead>
 <tr>
-<th class="filter-false sorter-false">Select</th>
-<th class="th.method.name" data-placeholder="e.g. 'ZDOCK or Hex'">Method</th>
-<th class="th.refinement.name" data-placeholder="e.g. '!Nothing'">Refinement</th>
+<th class="filter-false sorter-false th.selectmodel">Select</th>
+<th class="filter-select th.method.name">Method</th>
+<th class="filter-select th.refinement.name">Refinement</th>
 <th class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
 <th class="th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
 <th class="th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
@@ -65,8 +65,6 @@
 <br>
 <input type="submit" value="Deselect all models" onclick="deselectmodels();"><br>
 <a href="{% url 'search' %}">Back to search</a>
-
-
 
 <script>
 function deselectmodels(){

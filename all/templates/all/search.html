@@ -2,11 +2,11 @@
 {% block content %}
 {% load static from staticfiles %}
 
-<div class="jumbotron" style="background-color:white;"><table><tr><td>
+<table><tr><td><div class="jumbotron" style="background-color:white;">
 <h1>Dockit</h1>
-<p>A database of protein-protein interaction models</p></td>
-<td align="center" style="width:500px;"><img src="{% static "image.png" %}" width="300px">
-</td></tr></table></div>
+<p>A database of protein-protein interaction models</p></div></td>
+<td align="center" style="width:500px;"><img src="{% static "image_new.png" %}" width="500px" style="opacity: 0.8;">
+</td></tr></table>
 
 <h2>Target search</h2>
 
@@ -51,8 +51,4 @@
 <table class="table">{{ form.as_table }}</table>
 <input type="submit" value="Submit" /></form>
 
-<script>
-function goTo(name) {
-	document.location.href=document.location.href+"target/"+name;
-}
-</script>{% endblock %}
+{% endblock %}

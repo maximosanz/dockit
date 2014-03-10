@@ -116,15 +116,15 @@ def scoring(request, scorer, target):
 def model(request, id):
 	#details on a particular model
         model = Model.objects.get(id=id)
-	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','model':''}
-	#file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','model':'results/'+model.method.name+'/'+model.refinement.name+'/'+model.target.difficulty+'/'+target.name+'/'+target.name+'_'+model.method.name+'_'+model.refinement.name+'_'+model.number+'.pdb-'+model.target.receptor_bound_chain+'-fitted}
+	#file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','model':''}
+	file_names = {'rb':'benchmarks/'+model.target.name+'_r_b.pdb','lb':'benchmarks/'+model.target.name+'_l_b.pdb','model':'results/'+model.method.name.lower()+'/'+model.refinement.name.lower()+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+model.refinement.name.lower()+'_'+str(model.number)+'.pdb-'+model.target.receptor_bound_chain+'-fitted'}
 
 	#get chain information to allow visualisation of receptor/ligand separately
 	model_rec_chains = "*:"+"/3.1 or *:".join(list(model.target.receptor_bound_chain))+"/3.1"
 	model_lig_chains = "*:"+"/3.1 or *:".join(list(model.target.ligand_bound_chain))+"/3.1"
 
 	#needs changing, from absolute filepath and to choose relevant file
-	interactions = extract_interactions('all/static/1ZM4_cluspro-balanced_nothing_1_caprifit-contacts.out',True)
+	interactions = extract_interactions('/project/data/dockit/static/results/'+model.method.name.lower()+'/'+model.refinement.name.lower()+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+model.refinement.name.lower()+'_'+str(model.number)+'_caprifit-contacts.out',True)
         context = {'model':model,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues']}
         return insert_form_and_go(request, 'all/model.html', context)
 

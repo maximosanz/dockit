@@ -18,7 +18,6 @@
 <input type="checkbox" id="target.ligand" name="Ligand_PDB_ID" onclick="refreshtable();" >Ligand PDB ID
 </form>
 <br>
-
 <table id="model_select_template" class="table" style='display:none;'>
 <thead>
 <tr>
@@ -63,7 +62,7 @@
   <form>
     <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
     <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
-    <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+    <span class="pagedisplay"></span> <!-- this can be any element, including an input-->
     <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
     <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
     <select class="pagesize">
@@ -108,4 +107,3 @@ $( document ).ready(refreshtable() );
 </script>
 
 {% endblock %}
-

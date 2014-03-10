@@ -26,7 +26,7 @@
 <script src="{% static "jsmol/js/JSmoljQueryExt.js" %}"></script>
 
 <!--personal jsmol functions-->
-<script src="{% static "jsmol_functions_temp.js" %}"></script>
+<script src="{% static "jsmol_functions.js" %}"></script>
 
 <!--opentip-->
 <script src="https://raw.github.com/enyo/opentip/master/downloads/opentip-jquery-excanvas.min.js"></script>
@@ -39,13 +39,13 @@
 <script src="{% static "tablesorter/addons/pager/jquery.tablesorter.pager.js" %}"></script>
 
 <!--call tablesorter on .tablesorter tables-->
-<script src="/static/tablesorter_function.js"></script>
+<script src="{% static "tablesorter_function.js" %}"></script>
 
 <!--script for target dropdown in navbar-->
 <script>
 function goTo(name) {
 	//needs changing to reverse url search
-	document.location.href="http://127.0.0.1:8000/target/"+name;
+	document.location.href="http://msc.bc.ic.ac.uk:8008/target/"+name;
 }
 
 //info for JSMol window

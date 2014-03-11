@@ -33,7 +33,7 @@
 <tbody>
 {% for model in results %}
 <tr class="bodytr" name="{{ model.id }}">
-<td class="td.modelcheckbox" style='width:40px' checked='unchecked'><center><input name="{{ model.id }}box" class="modelcheckbox" type="checkbox"></center></td>
+<td class="td.modelcheckbox" style='width:40px'><center><input name="results/{{ model.method.name }}/{{ model.refinement.name }}/{{ model.target.difficulty }}/{{ model.target.name }}/{{ model.target.name }}_{{ model.method.name }}_{{model.refinement.name }}_{{ model.number }}.pdb" class="modelcheckbox" type="checkbox"></center></td>
 <td class="td.method.name" style='width:160px'>{{ model.method.name }}</td>
 <td class="td.refinement.name" style='width:135px'>{{ model.refinement.name }}</td>
 <td class="td.i_rmsd">{{ model.i_rmsd }}</td>
@@ -102,9 +102,13 @@ function refreshtable(){
     $('#target_models_table .modelcheckbox').click(function(){
 	if (this.checked) {
             this.setAttribute('checked','checked');
+            boxid=this.getAttribute('name');
+            alert(boxid+" selected");
 	}
 	if (!this.checked) {
             this.removeAttribute('checked');
+            boxid=this.getAttribute('name');
+            alert(boxid+" deselected");
 	}
     });
     for(var k=0; k<ch.length; k++) {
@@ -130,7 +134,7 @@ function re_render() {
 //possibly breaks if only one file selected
 //need to unload files first?
 models_selected = []
-var receptor = "{% static 'benchmarks/'+target+'_r_b.pdb' %}";
+var receptor = "{\% static 'benchmarks/'+target+'_r_b.pdb' %\}";
 //var load_files = "load FILES \""+receptor+"\"";
 var load_files = "load \""+receptor+"\"";
 for (var i=0; i<models_selected.length; i++) {

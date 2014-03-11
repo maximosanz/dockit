@@ -130,7 +130,7 @@ function re_render() {
 //possibly breaks if only one file selected
 //need to unload files first?
 models_selected = []
-var receptor = "{% static 'benchmarks/'+target+'_r_b.pdb' %}";
+var receptor = Django.static('benchmarks/{{ target }}_r_b.pdb');
 //var load_files = "load FILES \""+receptor+"\"";
 var load_files = "load \""+receptor+"\"";
 for (var i=0; i<models_selected.length; i++) {

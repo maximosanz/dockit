@@ -7,15 +7,17 @@
 
 <!--jquery, used by bootstrap, highcharts, jsmol, tablesorter and opentip-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
 
 <!--bootstrap-->
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
-<!--<script src="https://raw.github.com/twbs/bootstrap/master/dist/js/bootstrap.min.js"></script>-->
 <script src="{% static "bootstrap.js" %}"></script>
 
 <!--highcharts-->
 <script src="http://code.highcharts.com/highcharts.js"></script>
 <script src="http://code.highcharts.com/highcharts-more.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 
 <!--jsmol-->
 <script src="{% static "jsmol/js/JSmolCore.js" %}"></script>
@@ -30,7 +32,6 @@
 <script src="{% static "jsmol_functions.js" %}"></script>
 
 <!--opentip-->
-<!--<script src="https://raw.github.com/enyo/opentip/master/downloads/opentip-jquery-excanvas.min.js"></script>-->
 <script src="{% static "opentip.js" %}"></script>
 <link href="{% static "opentip.css" %}" rel="stylesheet">
 
@@ -48,6 +49,7 @@
 function goTo(name) {
 	//needs changing to reverse url search
 	document.location.href="http://msc.bc.ic.ac.uk:8008/target/"+name;
+	//Django.url('target_info',name);
 }
 
 //info for JSMol window

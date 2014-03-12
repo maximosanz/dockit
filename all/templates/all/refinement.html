@@ -16,13 +16,14 @@
 
 <script>
 //change refinement graph when options are changed
-function change_graph(target,method,refinement) {
-document.location.href="/refinement_"+method+"_"+refinement+"_"+target;
+function change_graph(target,method,refinement,cutoff) {
+document.location.href="/refinement_"+method+"_"+refinement+"_"+target+"_"+cutoff;
 }
 
 var no_ref_irmsds = [{% for a in no_ref_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var improvements = [{% for b in improvements %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var ref_model_ids = [{% for c in ref_model_ids %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var cutoff = parseFloat('{{ cutoff }}');
 
 var data_series = []
 for (var i=0;i<improvements.length;i++) {
@@ -42,7 +43,9 @@ $(function () {
 	xAxis: {
 		title: {
 			text: 'Model I-RMSD without refinement'
-		}
+		},
+		min: 0,
+		max: cutoff
 	},
 	yAxis: {
 		title: {
@@ -86,40 +89,33 @@ $(function () {
 		}
 	}]
 	});
-
-	//var gaugeChartObj = new Highcharts.Chart(refinement_graph);
-
-	$("#slider1").slider({
-        value: 20,
-        //range: "min",
-        min: 0,
-        max: 50,
-        animate: true,
-        /*slide: function (event, ui) {
-             Highcharts.Chart(refinement_graph).xAxis[0].max = ui.value;
-        }*/
-        });
 });
 </script>
 
+<table class="table">
 <form name="refinement_graph_choices" action="">
-Choose a target:&nbsp;&nbsp;<select name="target_choice_all" style="width: 90px">
+<tr><td>Choose a target:</td>
+<td><select name="target_choice_all" style="width: 90px">
 {% for each_target in target_names %}
 <option value={{ each_target }}>{{ each_target }}</option>
 {% endfor %}
-</select>
-Choose a docking method:&nbsp;&nbsp;<select name="docking_method">
+</select></td></tr>
+<tr><td>Choose a docking method:</td>
+<td><select name="docking_method">
 {% for each_method in method_names %}
 <option value={{ each_method }}>{{ each_method }}</option>
 {% endfor %}
-</select>
-Choose a refinement method:&nbsp;&nbsp;<select name="refinement_method">
+</select></td></tr>
+<tr><td>Choose a refinement method:</td>
+<td><select name="refinement_method">
 {% for each_refinement in refinement_names %}
 <option value={{ each_refinement }}>{{ each_refinement }}</option>
 {% endfor %}
-</select>
-<button type="button" onClick='change_graph(document.refinement_graph_choices.target_choice_all.options[document.refinement_graph_choices.target_choice_all.selectedIndex].value,document.refinement_graph_choices.docking_method.options[document.refinement_graph_choices.docking_method.selectedIndex].value,document.refinement_graph_choices.refinement_method.options[document.refinement_graph_choices.refinement_method.selectedIndex].value)'>Update</button>
-</form>
+</select></td></tr>
+<tr><td>Choose a cut-off I-RMSD:</td>
+<td><input type="text" name="cutoff_irmsd" value="10" size=6></td></tr>
+<tr><td></td><td><button type="button" onClick='change_graph(document.refinement_graph_choices.target_choice_all.options[document.refinement_graph_choices.target_choice_all.selectedIndex].value,document.refinement_graph_choices.docking_method.options[document.refinement_graph_choices.docking_method.selectedIndex].value,document.refinement_graph_choices.refinement_method.options[document.refinement_graph_choices.refinement_method.selectedIndex].value,document.refinement_graph_choices.cutoff_irmsd.value)'>Update</button></td></tr>
+</form></table>
 
 <a href="{% url 'search' %}">Back to start</a>
 {% endblock %}

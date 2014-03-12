@@ -1,5 +1,6 @@
-{% extends 'all/base.html' %}{% block title %}{{ target.name }}Models{% endblock %}
+{% extends 'all/base.html' %}{% block title %}{{ target.name }} Models{% endblock %}
 {% block content %}
+{% django_js jquery=false %}
 <h1>{{ target.name }} models</h1>
 
 <p><a href="{% url 'target_info' target.name %}">View target details</a></p>
@@ -33,7 +34,7 @@
 <tbody>
 {% for model in results %}
 <tr class="bodytr" name="{{ model.id }}">
-<td class="td.modelcheckbox" style='width:40px' checked='unchecked'><center><input name="{{ model.id }}box" class="modelcheckbox" type="checkbox"></center></td>
+<td class="td.modelcheckbox" style="width:40px"><center><input id="{{ model.id }}" class="modelcheckbox" type="checkbox"></center></td>
 <td class="td.method.name" style='width:160px'>{{ model.method.name }}</td>
 <td class="td.refinement.name" style='width:135px'>{{ model.refinement.name }}</td>
 <td class="td.i_rmsd">{{ model.i_rmsd }}</td>
@@ -63,8 +64,14 @@
   </form>
 </div>
 <br>
-<input type="submit" value="Deselect all models" onclick="deselectmodels();"><br>
+<input type="submit" value="Deselect all models" onclick="deselectmodels();">&nbsp;&nbsp;
+<input type="submit" value="Update view" onclick="re_render();"><br>
 <a href="{% url 'search' %}">Back to search</a>
+
+<script>
+//colour array
+var colour_array = ["lightgreen","gold","sienna","turquoise","darkgreen","orange","purple","slategray","mistyrose","beige"];
+</script>
 
 <script>
 function deselectmodels(){
@@ -83,8 +90,8 @@ function refreshtable(){
     var intable=template.innerHTML;
     var ch = new Array();
     $('#target_models_table [checked="checked"]').each(function() {
-	boxid=this.getAttribute('name');
-	ch.push(boxid);
+    boxid=this.getAttribute('name');
+    ch.push(boxid);
     });
     tbl.innerHTML = intable;
     var form=document.getElementById('columnselector');
@@ -102,9 +109,13 @@ function refreshtable(){
     $('#target_models_table .modelcheckbox').click(function(){
 	if (this.checked) {
             this.setAttribute('checked','checked');
+            boxid=this.getAttribute('name');
+            //alert(boxid+" selected");
 	}
 	if (!this.checked) {
             this.removeAttribute('checked');
+            boxid=this.getAttribute('name');
+            //alert(boxid+" deselected");
 	}
     });
     for(var k=0; k<ch.length; k++) {
@@ -124,27 +135,64 @@ function refreshtable(){
 //jsmol scripts will go here
 //create JSMol window
 jmolApplet0 = Jmol.getApplet("jmolApplet0", info);
-Jmol.script(jmolApplet0,"background black;");
+Jmol.script(jmolApplet0,"background white;");
 
 function re_render() {
-//possibly breaks if only one file selected
 //need to unload files first?
-models_selected = []
-var receptor = Django.static('benchmarks/{{ target }}_r_b.pdb');
-//var load_files = "load FILES \""+receptor+"\"";
-var load_files = "load \""+receptor+"\"";
-for (var i=0; i<models_selected.length; i++) {
-load_files += " \""+models_selected[i]+"\"";
+//find which models are selected
+var models_selected = [];
+$('#target_models_table [checked="checked"]').each(function() {
+boxid=this.getAttribute('name');
+models_selected.push(Django.static(boxid));
+});
+
+//get static urls for native receptor and ligand
+var receptor = Django.static('benchmarks/{{ target.name }}_r_b.pdb');
+var native_ligand = Django.static('benchmarks/{{ target.name }}_l_b.pdb');
+
+//only allow 10 models to be selected
+if (models_selected.length > 10) {
+	alert("Too many models selected: maximum 10");
+} else {
+	//construct load and colour command
+	var load_files = "load FILES \""+receptor+"\" \""+native_ligand+"\"";
+	for (var i=0; i<models_selected.length; i++) {
+		load_files += " \""+models_selected[i]+"\"";
+	}
+	//load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }}; display displayed or */1; display displayed or */2;; color */1 red; color */2 blue;";
+	load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }};";
+	//for (var i=0; i<models_selected.length; i++) {
+	//	load_files += " color */"+(i+3)+" "+colour_array[i]+";";
+	//}
+	Jmol.script(jmolApplet0,load_files);
 }
-load_files += "; CARTOON only; frame ALL;";
-//Jmol.script(jmolApplet0,load_files);
 }
 </script>
 </td><td>
-
+Red - Native receptor<br>
+Blue - Native ligand<br><br>
+The model ligands are coloured as shown in the table above
 </td></tr></table>
 
+<form name="term_form" onSubmit="return false">
+JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300px" />
+<button onClick=update_Jmol(document.term_form.terminal.value)>Update</button>
+<button onClick=reset_Jmol();>Reset</button></form><br>
+
 <script>
+{% for model in results %}
+$(document).ready(function() {
+	var model_method_name = "{{ model.method.name }}".toLowerCase();
+	var model_refinement_name = "{{ model.refinement.name }}".toLowerCase();
+	var model_target_difficulty = "{{ model.target.difficulty }}".toLowerCase();
+	var model_target_name = "{{ model.target.name }}";
+	var model_number = "{{ model.number }}";
+	var model_receptor_chains = "{{ model.target.receptor_bound_chain }}";
+	var filepath = "results/"+model_method_name+"/"+model_refinement_name+"/"+model_target_difficulty+"/"+model_target_name+"/"+model_target_name+"_"+model_method_name+"_"+model_refinement_name+"_"+model_number+".pdb-"+model_receptor_chains+"-fitted";
+	$('#target_models_table #{{ model.id }}').attr("name",filepath);
+});
+{% endfor %}
+
 $(document).ready(refreshtable());
 $(document).ready(re_render());
 </script>

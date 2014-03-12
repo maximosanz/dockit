@@ -8,6 +8,8 @@ from all.forms import model_select_form
 from all.extract import extract_interactions
 from django.contrib.staticfiles.templatetags.staticfiles import static
 import re
+from django.template import add_to_builtins
+add_to_builtins('djangojs.templatetags.js')
 
 def target(request):
 	#page with target table
@@ -32,6 +34,7 @@ def search(request):
 def summary(request,target):
 	#summary page
 	#get data for I-RMSD comparison graph
+	target_difficulty = Target.objects.get(name=target).difficulty
 	target_irmsds = []
 	best_model_irmsds = []
 	target_names = []
@@ -56,13 +59,13 @@ def summary(request,target):
 	for each in Method.objects.all():
 		methods.append(each.name)
 		try:
-			ordered_models = Model.objects.filter(target__name=target,method__name=each.name).order_by('i_rmsd')
+			ordered_models = Model.objects.filter(target__name=target,method__name=each.name,number__lte=500).order_by('i_rmsd')
 			irmsd_by_method.append(ordered_models[0].i_rmsd)
 		except:
 			irmsd_by_method.append(0)
 			print(each.name)
 
-	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds}
+	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds}
 	return insert_form_and_go(request,'all/summary.html',context)
 
 def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold):
@@ -96,7 +99,7 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 	else:
 		return insert_form_and_go(request, 'all/model_select.html', context)
 
-def scoring(request, scorer, target):
+def scoring(request, scorer, target, cutoff):
 	#comparison of scoring functions
 	model_irmsds = []
 	scores = []
@@ -113,7 +116,7 @@ def scoring(request, scorer, target):
 		except:
 			print('error')
 
-	context = {'target_names':Target.objects.values_list('name',flat=True),'scorer_names':ScoringFunction.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'target_choice':target,'scorer_choice':scorer,'model_irmsds':model_irmsds,'scores':scores,'model_ids':model_ids,'model_methods':model_methods}
+	context = {'target_names':Target.objects.values_list('name',flat=True),'scorer_names':ScoringFunction.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'target_choice':target,'scorer_choice':scorer,'model_irmsds':model_irmsds,'scores':scores,'model_ids':model_ids,'model_methods':model_methods,'cutoff':cutoff}
 	return insert_form_and_go(request, 'all/scoring.html', context)
 
 def model(request, id):
@@ -148,6 +151,13 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 	r_rmsd_threshold = float(re.sub('-', '.', r_rmsd_threshold))
 	fnat_threshold = float(re.sub('-', '.', fnat_threshold))
 	target = Target.objects.get(name=name)
+	
+	lig_chains = list(target.ligand_bound_chain)
+	display_lig_chains = "display *:"+lig_chains[0]+"/*;"
+	for i in range(len(lig_chains)-1):
+		display_lig_chains += " display displayed or *:"+lig_chains[i+1]+"/*;"
+	display_lig_chains = display_lig_chains[:-1]
+
 	results = Model.objects.filter(target__name=name)
 	if i_rmsd_threshold != 0:
 		results = results.filter(i_rmsd__lte=i_rmsd_threshold)
@@ -161,7 +171,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 		results = results.filter(method__name=method)
 	if refinement != 'All':
 		results = results.filter(refinement__name=refinement)
-	context = {'target':target, 'results':results}
+	context = {'target':target, 'display_lig_chains':display_lig_chains, 'results':results}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	
 
@@ -169,7 +179,7 @@ def method(request):
 	#summary table of docking methods
 	return insert_form_and_go(request, 'all/method.html', {})
 
-def refinement(request,method,refinement,target):
+def refinement(request,method,refinement,target,cutoff):
 	#information on the effect of refinement
 	#for the minute constructs a graph for ZDock v ZDock/FiberDock performance for one target
 	no_ref_irmsds = []
@@ -179,7 +189,7 @@ def refinement(request,method,refinement,target):
 		no_ref_irmsds.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd)
 		improvements.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd - Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='Nothing').i_rmsd)
 		ref_model_ids.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).id)
-	context = {'method':method,'refinement':refinement,'target':target,'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids,'target_names':Target.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'refinement_names':Refinement.objects.values_list('name',flat=True)}
+	context = {'method':method,'refinement':refinement,'target':target,'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids,'target_names':Target.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'refinement_names':Refinement.objects.values_list('name',flat=True),'cutoff':cutoff}
 	return insert_form_and_go(request, 'all/refinement.html', context)
 
 def about(request):

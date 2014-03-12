@@ -5,7 +5,7 @@
 <table><tr><td><div class="jumbotron" style="background-color:white;">
 <h1>Dockit</h1>
 <p>A database of protein-protein interaction models</p></div></td>
-<td align="center" style="width:500px;"><img src="{% static "image_new.png" %}" width="500px" style="opacity: 0.8;">
+<td align="center" style="width:500px;"><a href="{% url 'target_info' '1BGX' %}"><img src="{% static "image_new.png" %}" title="1BGX - click for more info" width="500px" style="opacity: 0.8;"></a>
 </td></tr></table>
 
 <h2>Target search</h2>
@@ -43,9 +43,9 @@
 
 <a href="{% url 'summary' '1BGX' %}">View summary of data</a><br><br>
 
-<a href="{% url 'scoring' 'PISA' '1BGX' %}">View summary of scoring functions</a><br><br>
+<a href="{% url 'scoring' 'PISA' '1BGX' '10' %}">View summary of scoring functions</a><br><br>
 
-<a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' %}">View information on refinement</a>
+<a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' '10' %}">View information on refinement</a>
 
 <h2>Model search</h2><form method='POST'>{% csrf_token %}
 <table class="table">{{ form.as_table }}</table>

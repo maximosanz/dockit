@@ -7,8 +7,6 @@
 
 <!--jquery, used by bootstrap, highcharts, jsmol, tablesorter and opentip-->
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-<script src="http://code.jquery.com/ui/1.8.18/jquery-ui.min.js" type="text/javascript"></script>
-<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/ui-lightness/jquery-ui.css" rel="stylesheet">
 
 <!--bootstrap-->
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
@@ -131,8 +129,8 @@ padding-top: 60px;
         </li>
 	<li><a href="{% url 'method' %}">Methods</a></li>
 	<li><a href="{% url 'summary' '1BGX' %}">Summary</a></li>
-	<li><a href="{% url 'scoring' 'PISA' '1BGX' %}">Scoring</a></li>
-	<li><a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' %}">Refinement</a></li>
+	<li><a href="{% url 'scoring' 'PISA' '1BGX' '10' %}">Scoring</a></li>
+	<li><a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' '10' %}">Refinement</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a href="{% url 'about' %}">About</a></li>

@@ -8,30 +8,17 @@
 
 <div id="scoring_graph" style="width:100%; height:600px;"></div>
 
-<form name="scoring_graph_choices">
-Choose a target:&nbsp;&nbsp;<select name="target_choice_all" style="width: 90px">
-{% for each_target in target_names %}
-<option value={{ each_target }}>{{ each_target }}</option>
-{% endfor %}
-</select>
-Choose a scoring method:&nbsp;&nbsp;<select name="scoring_method" style="width: 90px">
-{% for each_scorer in scorer_names %}
-<option value={{ each_scorer }}>{{ each_scorer }}</option>
-{% endfor %}
-</select>
-<button type="button" onClick='change_graph(document.scoring_graph_choices.target_choice_all.options[document.scoring_graph_choices.target_choice_all.selectedIndex].value,document.scoring_graph_choices.scoring_method.options[document.scoring_graph_choices.scoring_method.selectedIndex].value)'>Update</button>
-</form>
-
 <script>
 //change scoring graph when options are changed
-function change_graph(target,scorer) {
-document.location.href="/scoring_"+scorer+"_"+target;
+function change_graph(target,scorer,cutoff) {
+document.location.href="/scoring_"+scorer+"_"+target+"_"+cutoff;
 }
 
 var model_irmsds = [{% for a in model_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var scores = [{% for b in scores %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var model_ids = [{% for c in model_ids %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var model_methods = [{% for d in model_methods %}"{{ d }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var cutoff = parseFloat('{{ cutoff }}');
 
 var data_series = []
 for (var i=0;i<model_irmsds.length;i++) {
@@ -52,7 +39,9 @@ $(function () {
 	xAxis: {
 		title: {
 			text: 'I-RMSD of model'
-		}
+		},
+		min: 0,
+		max: cutoff
 	},
 	yAxis: {
 		title: {
@@ -96,6 +85,25 @@ $(function () {
 	]});
 });
 </script>
+
+<table class="table">
+<form name="scoring_graph_choices">
+<tr><td>Choose a target:</td>
+<td><select name="target_choice_all" style="width: 90px">
+{% for each_target in target_names %}
+<option value={{ each_target }}>{{ each_target }}</option>
+{% endfor %}
+</select></td></tr>
+<tr><td>Choose a scoring method:</td>
+<td><select name="scoring_method" style="width: 90px">
+{% for each_scorer in scorer_names %}
+<option value={{ each_scorer }}>{{ each_scorer }}</option>
+{% endfor %}
+</select></td></tr>
+<tr><td>Choose a cut-off I-RMSD:</td>
+<td><input type="text" name="cutoff_irmsd" value="10" size=6></td></tr>
+<tr><td></td><td><button type="button" onClick='change_graph(document.scoring_graph_choices.target_choice_all.options[document.scoring_graph_choices.target_choice_all.selectedIndex].value,document.scoring_graph_choices.scoring_method.options[document.scoring_graph_choices.scoring_method.selectedIndex].value,document.scoring_graph_choices.cutoff_irmsd.value)'>Update</button></td></tr>
+</form></table>
 
 <a href="{% url 'search' %}">Back to start</a>
 {% endblock %}

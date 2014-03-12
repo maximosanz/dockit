@@ -8,15 +8,6 @@
 
 <div id="method_comparison" style="width:100%; height:600px;"></div>
 
-<form name="target_choice"">
-Choose a target:&nbsp;&nbsp;<select name="target_choice_all" onChange='change_graph(document.target_choice.target_choice_all.options[document.target_choice.target_choice_all.selectedIndex].value)' style="width: 90px">
-{% for each in target_names %}
-<option value={{ each }}>{{ each }}</option>
-{% endfor %}
-</select></form>
-
-<div id="irmsd_comparison" style="width:100%; height:600px;"></div>
-
 <script>
 //change method comparison graph when target choice is changed
 function change_graph(target) {
@@ -39,7 +30,7 @@ $(function () {
 		type: 'column'
 	},
 	title: {
-		text: 'Comparison of docking methods for {{ target_choice }}'
+		text: 'Comparison of docking methods for {{ target_choice }}, a {{ target_difficulty }} target'
 	},
 	legend : {
 		enabled: true
@@ -78,13 +69,24 @@ $(function () {
 	series: [{
 		name: 'I-RMSD of best model produced for {{ target_choice }}',
 		data: irmsd_by_method
-	}, {
-		name: 'Average I-RMSD of best models across all targets',
-		data: average_irmsds
 	}]
 	});
 });
+</script>
 
+<table class="table">
+<form name="target_choice"">
+<tr><td>Choose a target:</td>
+<td><select name="target_choice_all" onChange='change_graph(document.target_choice.target_choice_all.options[document.target_choice.target_choice_all.selectedIndex].value)' style="width: 90px">
+{% for each in target_names %}
+<option value={{ each }}>{{ each }}</option>
+{% endfor %}
+</select></td></tr>
+</form></table>
+
+<div id="irmsd_comparison" style="width:100%; height:600px;"></div>
+
+<script>
 //I-RMSD comparison graph
 var target_irmsds = [{% for i in target_irmsds %}"{{ i }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var best_model_irmsds = [{% for j in best_model_irmsds %}"{{ j }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];

@@ -71,15 +71,13 @@ if (!this.checked) {
 var colour_array = ["lightgreen","gold","sienna","turquoise","darkgreen","orange","purple","slategray","mistyrose","beige"];
 </script>
 
-<script>
-function deselectmodels(){
-</div><br>
 <input type="submit" id="deselectmodels" value="Deselect all models"><br>
 <a href="{% url 'search' %}">Back to search</a><br>
 
 <script>
 $('#deselectmodels').click(function(){
     $('#target_models_table .modelcheckbox').prop('checked', false);
+    $('#target_models_table .modelcheckbox').removeAttr('checked');
 });
 </script>
 
@@ -142,8 +140,8 @@ if (models_selected.length > 10) {
 	for (var i=0; i<models_selected.length; i++) {
 		load_files += " \""+models_selected[i]+"\"";
 	}
-	//load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }}; display displayed or */1; display displayed or */2;; color */1 red; color */2 blue;";
-	load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }};";
+	load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }}; display displayed or *\/1; color *\/1 red; color *\/2 blue;";
+	//load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }};";
 	//for (var i=0; i<models_selected.length; i++) {
 	//	load_files += " color */"+(i+3)+" "+colour_array[i]+";";
 	//}

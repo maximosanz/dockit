@@ -92,7 +92,7 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 		results = results.filter(method__name=method)
 	if refinement != 'All':
 		results = results.filter(refinement__name=refinement)
-
+	results=results.values('id','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','target__ligand','target__receptor')
 	context = {'results':results}
 	if target not in ['All', 'Rigid', 'Medium', 'Difficult']:
 		return HttpResponseRedirect(reverse('target_models',kwargs={'name':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold}))
@@ -171,6 +171,13 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 		results = results.filter(method__name=method)
 	if refinement != 'All':
 		results = results.filter(refinement__name=refinement)
+	results=results.values('id','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','number','target__receptor_bound_chain')
+
+	for model in results:
+		model['method__name_lower']=model['method__name'].lower()
+		model['refinement__name_lower']=model['refinement__name'].lower()
+		model['target__difficulty_lower']=model['target__difficulty'].lower()
+
 	context = {'target':target, 'display_lig_chains':display_lig_chains, 'results':results}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	

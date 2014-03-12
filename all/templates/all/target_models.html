@@ -3,40 +3,31 @@
 {% django_js jquery=false %}
 <h1>{{ target.name }} models</h1>
 
-<p><a href="{% url 'target_info' target.name %}">View target details</a></p>
+<p><a href="{% url 'target_info' target.name %}">View target details</a></p><br>
 
-<b>Show columns:</b>
-<form id="columnselector">
-<input type="checkbox" id="method.name" name="Method" onclick="refreshtable();" checked>Method&nbsp
-<input type="checkbox" id="refinement.name" name="Refinement" onclick="refreshtable();" checked>Refinement&nbsp
-<input type="checkbox" id="i_rmsd" name="I-RMSD" onclick="refreshtable();" checked>I-RMSD&nbsp
-<input type="checkbox" id="l_rmsd" name="L-RMSD" onclick="refreshtable();" checked>L-RMSD&nbsp
-<input type="checkbox" id="r_rmsd" name="R-RMSD" onclick="refreshtable();" checked>R-RMSD&nbsp
-<input type="checkbox" id="fnat" name="Fnat" onclick="refreshtable();" checked>Fnat&nbsp
-<input type="checkbox" id="i_l_rmsd" name="I-L-RMSD" onclick="refreshtable();" >I-L-RMSD&nbsp
-</form>
-<br>
+<button id="popover" type="button" class="btn btn-default">
+  Select Columns
+</button><br><br>
 
-<table id="target_models_template" class="table" style='display:none;'>
+<table id="target_models_table" class="tablesorter bootstrap-popup">
 <thead>
 <tr>
-<th class="filter-false sorter-false th.selectmodel">Select</th>
-<th class="filter-select th.method.name">Method</th>
-<th class="filter-select th.refinement.name">Refinement</th>
-<th class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
-<th class="th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
-<th class="th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
-<th class="th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
-<th class="th.i_l_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="critical" class="filter-false sorter-false th.selectmodel">Select</th>
+<th data-priority="1" class="filter-select th.method.name">Method</th>
+<th data-priority="2" class="filter-select th.refinement.name">Refinement</th>
+<th data-priority="3" class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
+<th data-priority="4" class="th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th data-priority="5" class="th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th data-priority="3" class="th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th data-priority="5" class="th.i_l_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
 </tr>
-
 </thead>
 <tbody>
 {% for model in results %}
 <tr class="bodytr" name="{{ model.id }}">
-<td class="td.modelcheckbox" style="width:40px"><center><input id="{{ model.id }}" class="modelcheckbox" type="checkbox"></center></td>
-<td class="td.method.name" style='width:160px'>{{ model.method.name }}</td>
-<td class="td.refinement.name" style='width:135px'>{{ model.refinement.name }}</td>
+<td class="td.modelcheckbox" style="width:40px"><center><input name="results/{{ model.method__name_lower }}/{{ model.refinement__name_lower }}/{{ model.target__difficulty_lower }}/{{ model.target__name }}/{{ model.target__name }}_{{ model.method__name_lower }}_{{ model.refinement__name_lower }}_{{ model.number }}.pdb-{{ model.target__receptor_bound_chain }}-fitted" class="modelcheckbox" type="checkbox"></center></td>
+<td class="td.method.name" style='width:160px'>{{ model.method__name }}</td>
+<td class="td.refinement.name" style='width:135px'>{{ model.refinement__name }}</td>
 <td class="td.i_rmsd">{{ model.i_rmsd }}</td>
 <td class="td.l_rmsd">{{ model.l_rmsd }}</td>
 <td class="td.r_rmsd">{{ model.r_rmsd }}</td>
@@ -47,12 +38,11 @@
 {% endfor %}
 </tbody>
 </table>
-<table id="target_models_table" class="tablesorter"></table>
 <div id="ts-pager" class="ts-pager">
   <form>
     <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
     <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
-    <span class="pagedisplay"></span> <!-- this can be any element, including an input -->
+    <span class="pagedisplay"></span>
     <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
     <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
     <select class="pagesize">
@@ -67,7 +57,15 @@
 <input type="submit" value="Deselect all models" onclick="deselectmodels();">&nbsp;&nbsp;
 <input type="submit" value="Update view" onclick="re_render();"><br>
 <a href="{% url 'search' %}">Back to search</a>
-
+<script>
+$('#target_models_table .modelcheckbox').click(function(){
+if (this.checked) {
+	this.setAttribute('checked','checked');
+}
+if (!this.checked) {
+	this.removeAttribute('checked');
+}});
+</script>
 <script>
 //colour array
 var colour_array = ["lightgreen","gold","sienna","turquoise","darkgreen","orange","purple","slategray","mistyrose","beige"];
@@ -75,59 +73,44 @@ var colour_array = ["lightgreen","gold","sienna","turquoise","darkgreen","orange
 
 <script>
 function deselectmodels(){
-    $('#target_models_table .modelcheckbox').prop('checked', false);
-    $('#target_models_table .modelcheckbox').removeAttr('checked');
-}
-</script>
+</div><br>
+<input type="submit" id="deselectmodels" value="Deselect all models"><br>
+<a href="{% url 'search' %}">Back to search</a><br>
 
 <script>
+$('#deselectmodels').click(function(){
+    $('#target_models_table .modelcheckbox').prop('checked', false);
+});
+</script>
 
-function refreshtable(){
-    var th='.th\\.';
-    var td='.td\\.';
-    var template=document.getElementById('target_models_template');
-    var tbl=document.getElementById('target_models_table');
-    var intable=template.innerHTML;
-    var ch = new Array();
-    $('#target_models_table [checked="checked"]').each(function() {
-    boxid=this.getAttribute('name');
-    ch.push(boxid);
-    });
-    tbl.innerHTML = intable;
-    var form=document.getElementById('columnselector');
-    var columns=form.getElementsByTagName('input');
-    for(var i=0; i<columns.length; i++) {
-	if (!columns[i].checked) {
-            var rawid=columns[i].id;
-            var id = rawid.replace(".", "\\.");
-            var headerclass=th+id;
-            var cellclass=td+id;
-            $('#target_models_table ' + headerclass).remove();
-            $('#target_models_table ' + cellclass).remove();
-	}
-    }
-    $('#target_models_table .modelcheckbox').click(function(){
-	if (this.checked) {
-            this.setAttribute('checked','checked');
-            boxid=this.getAttribute('name');
-            //alert(boxid+" selected");
-	}
-	if (!this.checked) {
-            this.removeAttribute('checked');
-            boxid=this.getAttribute('name');
-            //alert(boxid+" deselected");
-	}
-    });
-    for(var k=0; k<ch.length; k++) {
-	var selectedmodel=ch[k];
-	$('#target_models_table [name="'+selectedmodel+'"]').prop('checked',true);
-	$('#target_models_table [name="'+selectedmodel+'"]').attr('checked','checked');
-    }
-
-    $('.tablesorter').trigger("updateAll");
-
+<style id="css">
+#popover-target label {
+  margin: 0 5px;
+  display: block;
 }
+#popover-target input {
+  margin-right: 5px;
+}
+.popover {
+  margin-top: -65px; /* adjust popover position */
+}
+</style>
+<script id="js">$(function() {
 
+$('#popover')
+    .popover({
+      placement: 'right',
+      html: true, // required if content has HTML
+      content: '<div id="popover-target"></div>'
+    })
+    // bootstrap popover event triggered when the popover opens
+    .on('shown.bs.popover', function () {
+      // call this function to copy the column selection code into the popover
+      $.tablesorter.columnSelector.attachTo( $('.bootstrap-popup'), '#popover-target');
+    });
+
+
+});
 </script>
 
 <table name="layout_table"><tr><td>
@@ -180,20 +163,6 @@ JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300p
 <button onClick=reset_Jmol();>Reset</button></form><br>
 
 <script>
-{% for model in results %}
-$(document).ready(function() {
-	var model_method_name = "{{ model.method.name }}".toLowerCase();
-	var model_refinement_name = "{{ model.refinement.name }}".toLowerCase();
-	var model_target_difficulty = "{{ model.target.difficulty }}".toLowerCase();
-	var model_target_name = "{{ model.target.name }}";
-	var model_number = "{{ model.number }}";
-	var model_receptor_chains = "{{ model.target.receptor_bound_chain }}";
-	var filepath = "results/"+model_method_name+"/"+model_refinement_name+"/"+model_target_difficulty+"/"+model_target_name+"/"+model_target_name+"_"+model_method_name+"_"+model_refinement_name+"_"+model_number+".pdb-"+model_receptor_chains+"-fitted";
-	$('#target_models_table #{{ model.id }}').attr("name",filepath);
-});
-{% endfor %}
-
-$(document).ready(refreshtable());
 $(document).ready(re_render());
 </script>
 

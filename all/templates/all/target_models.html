@@ -3,7 +3,8 @@
 {% django_js jquery=false %}
 <h1>{{ target.name }} models</h1>
 
-<p><a href="{% url 'target_info' target.name %}">View target details</a></p><br>
+<p><a href="{% url 'target_info' target.name %}">View target details</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="{% url 'search' %}">Back to search</a></p><br>
 
 <button id="popover" type="button" class="btn btn-default">
   Select Columns
@@ -54,15 +55,20 @@
   </form>
 </div>
 <br>
-<p>Download table as CSV file:</p>
+<table class="table" style="width:600px;">
+<tr><td colspan="2">Download table as CSV file:</td></tr>
 <form>
-<input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table
-<input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells
-</form><br>
-<div id="downloadify"></div><br>
-<input type="submit" id="deselectmodels" value="Deselect all models"><br>
-<input type="submit" value="Update view" onclick="re_render();"><br>
-<a href="{% url 'search' %}">Back to search</a>
+<tr><td style="width:300px;"><input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table</td>
+<td style="width:300px;"><input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells</td></tr>
+</form>
+<tr><td colspan="2"><div id="downloadify" style="visibility:hidden;"></td></tr></div></table>
+
+<table class="table" style="width:600px;">
+<tr><td>Change JSmol view</td></tr>
+<tr><td><input type="submit" id="deselectmodels" value="Deselect all models">
+<input type="submit" value="Update view" onclick="re_render();"></td></tr>
+</table>
+
 <script>
 $('#target_models_table .modelcheckbox').click(function(){
 if (this.checked) {
@@ -125,9 +131,9 @@ function re_render() {
 //find which models are selected and create an array of filepaths
 var models_selected = [];
 counter = 0;
-$('#target_models_table .modelcheckbox').each(function() {
+/*$('#target_models_table .modelcheckbox').each(function() {
 $(this).parent().css( "background-color", "white" );
-});
+});*/
 $('#target_models_table [checked="checked"]').each(function() {
 boxid=this.getAttribute('name');
 models_selected.push(Django.static(boxid));
@@ -216,4 +222,5 @@ $(document).ready(function(){
 });
 </script>
 
+<p><a href="{% url 'search' %}">Back to search</a></p>
 {% endblock %}

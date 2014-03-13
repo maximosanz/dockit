@@ -1,5 +1,6 @@
 {% extends 'all/base.html' %}{% block title %}Model select{% endblock %}
 {% block content %}
+{% django_js jquery=false %}
 
 <h1>Model search results</h1>
 
@@ -60,7 +61,13 @@
   </form>
 </div>
 <br>
-<a href="{% url 'search' %}">Back to search</a>
+<p>Download table as CSV file:</p>
+<form>
+<input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table
+<input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells
+</form><br>
+<div id="downloadify"></div><br>
+<a href="{% url 'search' %}">Back to search</a><br>
 
 <style id="css">
 #popover-target label {
@@ -92,8 +99,47 @@ $('#popover')
 
 });
 </script>
-
 <script>
+
+$(document).ready(function(){
+    Downloadify.create('downloadify',{
+	swf: Django.static("downloadify/media/downloadify.swf"),
+	filename: "docking_models.csv",
+	data: function(){
+		var csv = [];
+		if(document.getElementById('downloadcsv_all').checked) {
+			var selection = $('#model_select_table').find('tbody tr');
+			var headselection = $('#model_select_table thead th');
+			var cells = 'td';
+		}
+		else if(document.getElementById('downloadcsv_onlyvisible').checked) {
+			var selection = $('#model_select_table').find('tbody tr:visible');
+			var headselection = $('#model_select_table thead th:visible');
+			var cells = 'td:visible';
+		};
+		var headrow=[];
+		headselection.each(function(){
+			headrow.push( $(this).text() );
+		});
+		csv.push( headrow.join(',') );		
+		selection.each(function(){
+			var row = [];
+			$(this).find(cells).not('.td\\.viewallmodels').not('.td\\.viewmodel').each(function(){
+				row.push( $(this).text() );
+			});
+			csv.push( row.join(',') )
+    		});
+		var csv_text=csv.join('\n');
+		return csv_text;
+	},
+	downloadImage: Django.static("downloadify/images/download.png"),
+	width: 175,
+	height: 30,
+    onError: function(){ 
+      alert('No visible cells'); 
+    },
+    });
+});
 </script>
 
 {% endblock %}

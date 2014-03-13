@@ -54,6 +54,12 @@
   </form>
 </div>
 <br>
+<p>Download table as CSV file:</p>
+<form>
+<input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table
+<input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells
+</form><br>
+<div id="downloadify"></div><br>
 <input type="submit" id="deselectmodels" value="Deselect all models"><br>
 <input type="submit" value="Update view" onclick="re_render();"><br>
 <a href="{% url 'search' %}">Back to search</a>
@@ -119,6 +125,9 @@ function re_render() {
 //find which models are selected and create an array of filepaths
 var models_selected = [];
 counter = 0;
+$('#target_models_table .modelcheckbox').each(function() {
+$(this).parent().css( "background-color", "white" );
+});
 $('#target_models_table [checked="checked"]').each(function() {
 boxid=this.getAttribute('name');
 models_selected.push(Django.static(boxid));
@@ -166,6 +175,45 @@ JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300p
 
 <script>
 $(document).ready(re_render());
+$(document).ready(function(){
+    Downloadify.create('downloadify',{
+	swf: Django.static("downloadify/media/downloadify.swf"),
+	filename: "docking_models.csv",
+	data: function(){
+		var csv = [];
+		if(document.getElementById('downloadcsv_all').checked) {
+			var selection = $('#target_models_table').find('tbody tr');
+			var headselection = $('#target_models_table thead th');
+			var cells = 'td';
+		}
+		else if(document.getElementById('downloadcsv_onlyvisible').checked) {
+			var selection = $('#target_models_table').find('tbody tr:visible');
+			var headselection = $('#target_models_table thead th:visible');
+			var cells = 'td:visible';
+		};
+		var headrow=[];
+		headselection.not('.th\\.selectmodel').each(function(){
+			headrow.push( $(this).text() );
+		});
+		csv.push( headrow.join(',') );		
+		selection.each(function(){
+			var row = [];
+			$(this).find(cells).not('.td\\.modelcheckbox').not('.td\\.viewmodel').each(function(){
+				row.push( $(this).text() );
+			});
+			csv.push( row.join(',') )
+    		});
+		var csv_text=csv.join('\n');
+		return csv_text;
+	},
+	downloadImage: Django.static("downloadify/images/download.png"),
+	width: 175,
+	height: 30,
+    onError: function(){ 
+      alert('No visible cells'); 
+    },
+    });
+});
 </script>
 
 {% endblock %}

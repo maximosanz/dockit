@@ -54,7 +54,7 @@
   </form>
 </div>
 <br>
-<input type="submit" value="Deselect all models" onclick="deselectmodels();">&nbsp;&nbsp;
+<input type="submit" id="deselectmodels" value="Deselect all models"><br>
 <input type="submit" value="Update view" onclick="re_render();"><br>
 <a href="{% url 'search' %}">Back to search</a>
 <script>
@@ -70,9 +70,6 @@ if (!this.checked) {
 //colour array
 var colour_array = ["lightgreen","gold","sienna","turquoise","darkgreen","orange","purple","slategray","mistyrose","beige"];
 </script>
-
-<input type="submit" id="deselectmodels" value="Deselect all models"><br>
-<a href="{% url 'search' %}">Back to search</a><br>
 
 <script>
 $('#deselectmodels').click(function(){
@@ -119,12 +116,15 @@ jmolApplet0 = Jmol.getApplet("jmolApplet0", info);
 Jmol.script(jmolApplet0,"background white;");
 
 function re_render() {
-//need to unload files first?
-//find which models are selected
+//find which models are selected and create an array of filepaths
 var models_selected = [];
+counter = 0;
 $('#target_models_table [checked="checked"]').each(function() {
 boxid=this.getAttribute('name');
 models_selected.push(Django.static(boxid));
+//change background colour of checked cells
+$(this).parent().css( "background-color", colour_array[counter] );
+counter = counter + 1;
 });
 
 //get static urls for native receptor and ligand
@@ -140,19 +140,23 @@ if (models_selected.length > 10) {
 	for (var i=0; i<models_selected.length; i++) {
 		load_files += " \""+models_selected[i]+"\"";
 	}
-	load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }}; display displayed or *\/1; color *\/1 red; color *\/2 blue;";
-	//load_files += "; CARTOON only; frame ALL; hide ALL; {{ display_lig_chains }};";
-	//for (var i=0; i<models_selected.length; i++) {
-	//	load_files += " color */"+(i+3)+" "+colour_array[i]+";";
-	//}
+	load_files += "; CARTOON only; frame ALL; {{ hide_rec_chains }}; display displayed or (model=1.1); color (model=1.1) red; color (model=2.1) blue;";
+
+	for (var i=0; i<models_selected.length; i++) {
+		load_files += " color (model="+(i+3)+".1) "+colour_array[i]+";";
+	}
 	Jmol.script(jmolApplet0,load_files);
 }
 }
 </script>
 </td><td>
-Red - Native receptor<br>
-Blue - Native ligand<br><br>
-The model ligands are coloured as shown in the table above
+<table class="table">
+<tr><td style="background-color:red; width:60px"><center><font color="white"><b>Red</b></font></center></td>
+<td>Native receptor</td></tr>
+<tr><td style="background-color:blue; width:60px"><center><font color="white"><b>Blue</b></font></center></td>
+<td>Native ligand</td></tr>
+<tr><td colspan="2">The model ligands are coloured as shown in the table above</td></tr></table>
+
 </td></tr></table>
 
 <form name="term_form" onSubmit="return false">

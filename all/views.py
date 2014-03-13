@@ -151,12 +151,12 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 	r_rmsd_threshold = float(re.sub('-', '.', r_rmsd_threshold))
 	fnat_threshold = float(re.sub('-', '.', fnat_threshold))
 	target = Target.objects.get(name=name)
-	
-	lig_chains = list(target.ligand_bound_chain)
-	display_lig_chains = "display *:"+lig_chains[0]+"/*;"
-	for i in range(len(lig_chains)-1):
-		display_lig_chains += " display displayed or *:"+lig_chains[i+1]+"/*;"
-	display_lig_chains = display_lig_chains[:-1]
+
+	rec_chains = list(target.receptor_bound_chain)
+	hide_rec_chains = ""
+	for i in range(len(rec_chains)):
+		hide_rec_chains += " hide hidden or (chain="+rec_chains[i]+");"
+	hide_rec_chains = hide_rec_chains[1:-1]
 
 	results = Model.objects.filter(target__name=name)
 	if i_rmsd_threshold != 0:
@@ -178,7 +178,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 		model['refinement__name_lower']=model['refinement__name'].lower()
 		model['target__difficulty_lower']=model['target__difficulty'].lower()
 
-	context = {'target':target, 'display_lig_chains':display_lig_chains, 'results':results}
+	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':results}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	
 

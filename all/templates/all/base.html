@@ -6,7 +6,7 @@
 {% load static from staticfiles %}
 
 <!--jquery, used by bootstrap, highcharts, jsmol, tablesorter and opentip-->
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+<script src="{% static "jquery-1-8-2.min.js" %}"></script>
 
 <!--bootstrap-->
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
@@ -33,6 +33,9 @@
 <script src="{% static "opentip.js" %}"></script>
 <link href="{% static "opentip.css" %}" rel="stylesheet">
 
+<!--personal tooltip text-->
+<script src="{% static "tooltips.js" %}"></script>
+
 <!--tablesorter-->
 <link rel="stylesheet" href="{% static "tablesorter/css/theme.bootstrap.css" %}">
 <script src="{% static "tablesorter/js/jquery.tablesorter.js" %}"></script>
@@ -52,9 +55,11 @@
 <!--script for target dropdown in navbar-->
 <script>
 function goTo(name) {
+	if (name != "-") {
 	//needs changing to reverse url search
 	document.location.href="http://msc.bc.ic.ac.uk:8008/target/"+name;
 	//Django.url('target_info',name);
+	}
 }
 
 //info for JSMol window
@@ -88,38 +93,42 @@ padding-top: 60px;
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'search' %}"><span class="glyphicon glyphicon-home"></span> Dockit</a>
+      <a class="navbar-brand home" href="{% url 'search' %}"><span class="glyphicon glyphicon-home"></span> Dockit</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Target<b class="caret"></b></a>
+          <a href="#" class="dropdown-toggle target" data-toggle="dropdown">Target<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <table class="table" style="width:320px;border-collapse:separate;border-spacing:10px">
             <form name="target_select_nav">
 		<tr><td><a href="{% url 'target' %}">View all benchmarks</a></td><td></td></tr>
 		<tr><td>Select from all targets:</td>
-		<td><select name="target_choice_all" onChange=goTo(document.target_select_nav.target_choice_all.options[document.target_select_nav.target_choice_all.selectedIndex].value) style="width: 90px">
+		<td><select name="target_choice_all" onChange=goTo(document.target_select_nav.target_choice_all.options[document.target_select_nav.target_choice_all.selectedIndex].value) style="width: 80px">
+		<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 		{% for complex in Target %}
 			<option value={{ complex.name }}>{{ complex.name }}</option>
 		{% endfor %}</select></td></tr>
 
 		<tr><td>Select from rigid targets:</td>
-		<td><select name="target_choice_rig" onChange=goTo(document.target_select_nav.target_choice_rig.options[document.target_select_nav.target_choice_rig.selectedIndex].value) style="width: 90px">
+		<td><select name="target_choice_rig" onChange=goTo(document.target_select_nav.target_choice_rig.options[document.target_select_nav.target_choice_rig.selectedIndex].value) style="width: 80px">
+		<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 		{% for complex in Rigid %}
 			<option value={{ complex.name }}>{{ complex.name }}</option>
 		{% endfor %}</select></td></tr>
 
 		<tr><td>Select from medium targets:</td>
-		<td><select name="target_choice_med" onChange=goTo(document.target_select_nav.target_choice_med.options[document.target_select_nav.target_choice_med.selectedIndex].value) style="width: 90px">
+		<td><select name="target_choice_med" onChange=goTo(document.target_select_nav.target_choice_med.options[document.target_select_nav.target_choice_med.selectedIndex].value) style="width: 80px">
+		<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 		{% for complex in Medium %}
 			<option value={{ complex.name }}>{{ complex.name }}</option>
 		{% endfor %}</select></td></tr>
 
 		<tr><td>Select from difficult targets:</td>
-		<td><select name="target_choice_diff" onChange=goTo(document.target_select_nav.target_choice_diff.options[document.target_select_nav.target_choice_diff.selectedIndex].value) style="width: 90px">
+		<td><select name="target_choice_diff" onChange=goTo(document.target_select_nav.target_choice_diff.options[document.target_select_nav.target_choice_diff.selectedIndex].value) style="width: 80px">
+		<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 		{% for complex in Difficult %}
 			<option value={{ complex.name }}>{{ complex.name }}</option>
 		{% endfor %}</select></td></tr>
@@ -127,20 +136,20 @@ padding-top: 60px;
           </ul>
         </li>
         <li class="dropdown">
-          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Model<b class="caret"></b></a>
+          <a href="#" class="dropdown-toggle model" data-toggle="dropdown">Model<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <form method='POST'>{% csrf_token %}
             <table class="table" style="width:500px;border-collapse:separate;border-spacing:10px">{{ form.as_table }}
             <tr><td></td><td><input type="submit" value="Submit" /></td></tr></table></form>
           </ul>
         </li>
-	<li><a href="{% url 'method' %}">Methods</a></li>
-	<li><a href="{% url 'summary' '1BGX' %}">Summary</a></li>
-	<li><a href="{% url 'scoring' 'PISA' '1BGX' '10' %}">Scoring</a></li>
-	<li><a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' '10' %}">Refinement</a></li>
+	<li><a class="methods" href="{% url 'method' %}">Methods</a></li>
+	<li><a class="summary" href="{% url 'summary' '1BGX' %}">Summary</a></li>
+	<li><a class="scoring" href="{% url 'scoring' 'PISA' '1BGX' '10' %}">Scoring</a></li>
+	<li><a class="refinement_page" href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' '10' %}">Refinement</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a class="about" href="{% url 'about' %}">About</a></li>
       </ul>
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->

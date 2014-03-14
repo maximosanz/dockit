@@ -3,44 +3,48 @@
 {% load static from staticfiles %}
 
 <div class="page-header">
-<h1>Model details <small>Some text</small></h1>
+<h1>Model details <small><a href="{% url 'target_info' model.target.name %}" class="view_target">View target details</a></small></h1>
 </div>
 
 <table class="table"><tr>
-<td>Complex</td>
-<td>{{ model.target.complex }}</td>
+
+<td colspan="2"><a href="{% url 'target_models' model.target.name 'All' 'All' 0 0 0 0 %}" class="view_models">View other models for {{ model.target.name }}</a></td>
 </tr><tr>
 
-<td>Method</td>
-<td>{{ model.method.name }}</td>
+<td><span class="pdb_id">Target</span></td>
+<td><a href="{{ pdb_url }}{{ model.target.name }}" target="_blank" class="pdb_id">{{ model.target.name }}</a></td>
 </tr><tr>
 
-<td>Refinement</td>
-<td>{{ model.refinement.name }}</td>
+<td><span class="method">Method</span></td>
+<td><span class="method">{{ model.method.name }}</span></td>
 </tr><tr>
 
-<td>R-RMSD</td>
-<td>{{ model.r_rmsd }}</td>
+<td><span class="refinement">Refinement</span></td>
+<td><span class="refinement">{{ model.refinement.name }}</span></td>
 </tr><tr>
 
-<td>L-RMSD</td>
-<td>{{ model.l_rmsd }}</td>
+<td><span class="r_rmsd">R-RMSD</span></td>
+<td><span class="r_rmsd">{{ model.r_rmsd }}</span></td>
 </tr><tr>
 
-<td>I-RMSD</td>
-<td>{{ model.i_rmsd }}</td>
+<td><span class="l_rmsd">L-RMSD</span></td>
+<td><span class="l_rmsd">{{ model.l_rmsd }}</span></td>
 </tr><tr>
 
-<td>L-I-RMSD</td>
-<td>{{ model.i_l_rmsd }}</td>
+<td><span class="i_rmsd_model">I-RMSD</span></td>
+<td><span class="i_rmsd_model">{{ model.i_rmsd }}</span></td>
 </tr><tr>
 
-<td>fnat</td>
-<td>{{ model.fnat }}</td>
+<td><span class="l_i_rmsd">L-I-RMSD</span></td>
+<td><span class="l_i_rmsd">{{ model.i_l_rmsd }}</span></td>
 </tr><tr>
 
-<td>DASA</td>
-<td>{{ model.dasa }}</td>
+<td><span class="fnat">Fnat</span></td>
+<td><span class="fnat">{{ model.fnat }}</span></td>
+</tr><tr>
+
+<td><span class="dasa">DASA</span></td>
+<td><span class="dasa">{{ model.dasa }}</span></td>
 </tr><tr>
 
 <td>ZRANK score</td>
@@ -55,7 +59,7 @@
 <td>{{ pisa_score }}</td>
 </tr></table>
 
-<table name="layout_table"><tr><td>
+<table name="layout_table"><tr><td class="jsmol">
 <script>
 //visibility of native_rec, native_lig , model_rec, model_lig
 var vis_array = [true,true,true,true];
@@ -105,22 +109,22 @@ Jmol.script(jmolApplet0,"select {"+ref_int_5A_residues+"}; spacefill on");
 </script><br></td>
 
 <td style="padding-left: 10px;line-height: 1.5;">
-Receptor chains in bound structure:<br>
+Receptor chains in native structure:<br>
 <script>
 document.write("{{ model.target.receptor_bound_chain }} - "+rec_colours[0]);
 </script>
 <br><a id="toggle_1" onClick='toggle_visible(1)' style="cursor: pointer">Hide</a>
-<br><br>Ligand chains in bound structure:<br>
+<br><br>Ligand chains in native structure:<br>
 <script>
 document.write("{{ model.target.ligand_bound_chain }} - "+lig_colours[0]);
 </script>
 <br><a id="toggle_2" onClick='toggle_visible(2)' style="cursor: pointer">Hide</a>
-<br><br>Receptor chains in unbound structure:<br>
+<br><br>Receptor chains in model structure:<br>
 <script>
 document.write("{{ model.target.receptor_bound_chain }} - "+rec_colours[1]);
 </script>
 <br><a id="toggle_3" onClick='toggle_visible(3)' style="cursor: pointer">Hide</a>
-<br><br>Ligand chains in unbound structure:<br>
+<br><br>Ligand chains in model structure:<br>
 <script>
 document.write("{{ model.target.ligand_bound_chain }} - "+lig_colours[1]);
 </script>

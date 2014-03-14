@@ -24,7 +24,7 @@ def target_info(request, name):
 	#interactions = extract_interactions(static('bench_contacts/'+target.name+'_caprifit-contacts.out'),False)
 	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','ru':'benchmarks/'+target.name+'_r_u_cleanedup.pdb','lu':'benchmarks/'+target.name+'_l_u_cleanedup.pdb'}
 	#unbound interface residues and contacts inputted as empty to avoid drawing them (may change this)
-        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':"",'inp_int_5A_residues':"",'inp_int_10A_residues':""}
+        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':"",'inp_int_5A_residues':"",'inp_int_10A_residues':"",'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
         return insert_form_and_go(request, 'all/target_info.html', context)
 
 def search(request):
@@ -52,6 +52,7 @@ def summary(request,target):
 	#get data for method comparison graph
 	methods = []
 	irmsd_by_method = []
+	acceptable_by_method = []
 	
 	#averages across all targets need only be calculated once - here temporarily
 	average_irmsds = [5.20,12.68,2.78,5.75,5.75,6.44,6.21,7.54,9.02]
@@ -61,11 +62,19 @@ def summary(request,target):
 		try:
 			ordered_models = Model.objects.filter(target__name=target,method__name=each.name,number__lte=500).order_by('i_rmsd')
 			irmsd_by_method.append(ordered_models[0].i_rmsd)
+			
 		except:
 			irmsd_by_method.append(0)
+
+		try:
+			no_acceptables = Model.objects.filter(target__name=target,method__name=each.name,number__lte=500,capri_ev__gt=0).count()
+			acceptable_by_method.append(no_acceptables)
+
+		except:
+			acceptable_by_method.append(0)
 			print(each.name)
 
-	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds}
+	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds,'acceptable_by_method':acceptable_by_method}
 	return insert_form_and_go(request,'all/summary.html',context)
 
 def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold):

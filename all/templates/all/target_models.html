@@ -1,10 +1,12 @@
-{% extends 'all/base.html' %}{% block title %}{{ target.name }} Models{% endblock %}
+{% extends 'all/base.html' %}{% block title %}{{ target.name }} models{% endblock %}
 {% block content %}
 {% django_js jquery=false %}
-<h1>{{ target.name }} models</h1>
 
-<p><a href="{% url 'target_info' target.name %}">View target details</a>&nbsp;&nbsp;&nbsp;&nbsp;
-<a href="{% url 'search' %}">Back to search</a></p><br>
+<div class="page-header">
+<h1>{{ target.name }} models <small><a href="{% url 'target_info' target.name %}" class="view_target">View target details</a></small></h1>
+</div>
+
+<a href="{% url 'search' %}">Back to search</a><br><br>
 
 <button id="popover" type="button" class="btn btn-default">
   Select Columns
@@ -13,20 +15,20 @@
 <table id="target_models_table" class="tablesorter bootstrap-popup">
 <thead>
 <tr>
-<th data-priority="critical" class="filter-false sorter-false th.selectmodel">Select</th>
-<th data-priority="1" class="filter-select th.method.name">Method</th>
-<th data-priority="2" class="filter-select th.refinement.name">Refinement</th>
-<th data-priority="3" class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
-<th data-priority="4" class="th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
-<th data-priority="5" class="th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
-<th data-priority="3" class="th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
-<th data-priority="5" class="th.i_l_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="critical" class="filter-false sorter-false th.selectmodel select_model">Select</th>
+<th data-priority="1" class="filter-select th.method.name method">Method</th>
+<th data-priority="2" class="filter-select th.refinement.name refinement">Refinement</th>
+<th data-priority="3" class="th.i_rmsd i_rmsd_model" data-placeholder="e.g. '<=8'">I-RMSD</th>
+<th data-priority="4" class="th.l_rmsd l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th data-priority="5" class="th.r_rmsd r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th data-priority="3" class="th.fnat fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th data-priority="5" class="th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
 </tr>
 </thead>
 <tbody>
 {% for model in results %}
 <tr class="bodytr" name="{{ model.id }}">
-<td class="td.modelcheckbox" style="width:40px"><center><input name="results/{{ model.method__name_lower }}/{{ model.refinement__name_lower }}/{{ model.target__difficulty_lower }}/{{ model.target__name }}/{{ model.target__name }}_{{ model.method__name_lower }}_{{ model.refinement__name_lower }}_{{ model.number }}.pdb-{{ model.target__receptor_bound_chain }}-fitted" class="modelcheckbox" type="checkbox"></center></td>
+<td class="td.modelcheckbox" style="width:40px"><center><input name="results/{{ model.method__name_lower }}/{{ model.refinement__name_lower }}/{{ model.target__difficulty_lower }}/{{ model.target__name }}/{{ model.target__name }}_{{ model.method__name_lower }}_{{ model.refinement__name_lower }}_{{ model.number }}.pdb-{{ model.target__receptor_bound_chain }}-fitted" class="modelcheckbox select_model" type="checkbox"></center></td>
 <td class="td.method.name" style='width:160px'>{{ model.method__name }}</td>
 <td class="td.refinement.name" style='width:135px'>{{ model.refinement__name }}</td>
 <td class="td.i_rmsd">{{ model.i_rmsd }}</td>
@@ -34,7 +36,7 @@
 <td class="td.r_rmsd">{{ model.r_rmsd }}</td>
 <td class="td.fnat" style='width:100px'>{{ model.fnat }}</td>
 <td class="td.i_l_rmsd">{{ model.i_l_rmsd }}</td>
-<td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}">View model</a></td>
+<td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}" class="view_model">View model</a></td>
 </tr>
 {% endfor %}
 </tbody>
@@ -65,7 +67,7 @@
 
 <table class="table" style="width:600px;">
 <tr><td>Change JSmol view</td></tr>
-<tr><td><input type="submit" id="deselectmodels" value="Deselect all models">
+<tr><td><input type="submit" id="deselectmodels" value="Deselect all models">&nbsp;&nbsp;
 <input type="submit" value="Update view" onclick="re_render();"></td></tr>
 </table>
 
@@ -120,7 +122,7 @@ $('#popover')
 });
 </script>
 
-<table name="layout_table"><tr><td>
+<table name="layout_table"><tr><td class="jsmol">
 <script>
 //jsmol scripts will go here
 //create JSMol window
@@ -131,9 +133,9 @@ function re_render() {
 //find which models are selected and create an array of filepaths
 var models_selected = [];
 counter = 0;
-/*$('#target_models_table .modelcheckbox').each(function() {
+$('#target_models_table .modelcheckbox').each(function() {
 $(this).parent().css( "background-color", "white" );
-});*/
+});
 $('#target_models_table [checked="checked"]').each(function() {
 boxid=this.getAttribute('name');
 models_selected.push(Django.static(boxid));
@@ -219,8 +221,7 @@ $(document).ready(function(){
       alert('No visible cells'); 
     },
     });
-});
-</script>
+});</script>
 
 <p><a href="{% url 'search' %}">Back to search</a></p>
 {% endblock %}

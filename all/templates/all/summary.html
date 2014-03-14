@@ -6,6 +6,48 @@
 <h1>Summary <small>Some text</small></h1>
 </div>
 
+<div id="capri_comparison" style="width:100%; height:600px;"></div>
+
+<script>
+var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var acceptable_by_method = [{% for a in acceptable_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+for (var i=0;i<acceptable_by_method.length;i++) {
+acceptable_by_method[i] = parseFloat(acceptable_by_method[i])
+}
+
+$(function () {
+	$('#capri_comparison').highcharts({
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: 'Comparison of docking methods for {{ target_choice }}, a {{ target_difficulty }} target'
+	},
+	legend : {
+		enabled: false
+	},
+	xAxis: {
+		title: {
+			text: 'Docking method'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'Number of acceptable or better models produced in top 500 models'
+		}
+	},
+	xAxis: {
+		categories: methods
+	},
+	series: [{
+		name: 'Number of acceptable or better models produced in top 500 models',
+		data: acceptable_by_method
+	}]
+	});
+});
+</script>
+
 <div id="method_comparison" style="width:100%; height:600px;"></div>
 
 <script>
@@ -17,7 +59,6 @@ document.location.href="/summary_"+target;
 //Method comparison graph
 var irmsd_by_method = [{% for a in irmsd_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var average_irmsds = [{% for b in average_irmsds %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 
 for (var i=0;i<irmsd_by_method.length;i++) {
 irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
@@ -33,7 +74,7 @@ $(function () {
 		text: 'Comparison of docking methods for {{ target_choice }}, a {{ target_difficulty }} target'
 	},
 	legend : {
-		enabled: true
+		enabled: false
 	},
 	xAxis: {
 		title: {

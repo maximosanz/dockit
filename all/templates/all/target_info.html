@@ -3,30 +3,38 @@
 {% load static from staticfiles %}
 
 <div class="page-header">
-<h1>{{ target.name }} target details <small><a href="">View models</a></small></h1>
+<h1>{{ target.name }} target details <small><a href="{% url 'target_models' target.name 'All' 'All' 0 0 0 0 %}" class="view_models">View models</a></small></h1>
 </div>
 
 <table class="table"><tr>
-<td>Difficulty</td>
-<td>{{ target.difficulty }}</td>
+<td colspan="2"><a href="{{ pdb_url }}{{ target.name }}" target="_blank" class="pdb_page">View PDB entry</a></td>
 </tr><tr>
-<td>Category</td>
-<td>{{ target.category }}</td>
+<td><span class="difficulty">Difficulty</span></td>
+<td><span class="difficulty">{{ target.difficulty }}</span></td>
 </tr><tr>
-<td>Receptor PDB ID</td>
-<td>{{ target.receptor }}</td>
+<td><span class="category">Category</span></td>
+<td><span class="category">{{ target.category }}</span></td>
 </tr><tr>
-<td>Ligand PDB ID</td>
-<td>{{ target.ligand }}</td>
+<td><span class="rec_pdb_id">Receptor PDB ID</span></td>
+<td><a href="{{ pdb_url }}{{ target.receptor }}" target="_blank" class="rec_pdb_id">{{ target.receptor }}</a></td>
 </tr><tr>
-<td>Receptor description</td>
-<td>{{ target.receptor_description }}</td>
+<td><span class="lig_pdb_id">Ligand PDB ID</span></td>
+<td><a href="{{ pdb_url }}{{ target.ligand }}" target="_blank" class="lig_pdb_id">{{ target.ligand }}</a></td>
 </tr><tr>
-<td>Ligand description</td>
-<td>{{ target.ligand_description }}</td>
+<td><span class="rec_description">Receptor description</span></td>
+<td><span class="rec_description">{{ target.receptor_description }}</span></td>
+</tr><tr>
+<td><span class="lig_description">Ligand description</span></td>
+<td><span class="lig_description">{{ target.ligand_description }}</span></td>
+</tr><tr>
+<td><span class="i_rmsd">I-RMSD</span></td>
+<td><span class="i_rmsd"></span></td>
+</tr><tr>
+<td><span class="dasa">DASA</span></td>
+<td><span class="dasa"></span></td>
 </tr></table>
 
-<table name="layout_table"><tr><td>
+<table name="layout_table"><tr><td class="jsmol">
 <script>
 //visibility of native_rec, native_lig , unbound_rec, unbound_lig
 var vis_array = [true,true,false,false];
@@ -115,4 +123,5 @@ JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300p
 <button onClick=reset_Jmol();>Reset</button></form><br>
 
 <a href="{% url 'target' %}">View all benchmarks</a><br>
+
 {% endblock %}

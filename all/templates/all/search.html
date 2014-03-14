@@ -5,49 +5,47 @@
 <table><tr><td><div class="jumbotron" style="background-color:white;">
 <h1>Dockit</h1>
 <p>A database of protein-protein interaction models</p></div></td>
-<td align="center" style="width:500px;"><a href="{% url 'target_info' '1BGX' %}"><img src="{% static "image_new.png" %}" title="1BGX - click for more info" width="500px" style="opacity: 0.8;"></a>
+<td align="center" style="width:500px;"><a href="{% url 'target_info' '1BGX' %}"><img class="main_image" src="{% static "image_new.png" %}" width="500px" style="opacity: 0.8;"></a>
 </td></tr></table>
 
-<h2>Target search</h2>
+<h2><span class="target_search">Target search</span></h2>
 
 <table class="table">
-<tr><td><a href="{% url 'target' %}">View all benchmarks</a></td><td></td></tr>
+<tr><td><a href="{% url 'target' %}" class="view_targets">View all targets</a></td><td></td></tr>
 
 <form name="target_select">
 <tr><td>Select from all targets:</td>
-<td><select name="target_choice_all" onChange=goTo(document.target_select.target_choice_all.options[document.target_select.target_choice_all.selectedIndex].value) style="width: 90px">
+<td><select name="target_choice_all" onChange=goTo(document.target_select.target_choice_all.options[document.target_select.target_choice_all.selectedIndex].value) style="width: 80px">
+<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 {% for complex in Target %}
 	<option value={{ complex.name }}>{{ complex.name }}</option>
 {% endfor %}</select></td></tr>
 
 <tr><td>Select from rigid targets:</td>
-<td><select name="target_choice_rig" onChange=goTo(document.target_select.target_choice_rig.options[document.target_select.target_choice_rig.selectedIndex].value) style="width: 90px">
+<td><select name="target_choice_rig" onChange=goTo(document.target_select.target_choice_rig.options[document.target_select.target_choice_rig.selectedIndex].value) style="width: 80px">
+<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 {% for complex in Rigid %}
 	<option value={{ complex.name }}>{{ complex.name }}</option>
 {% endfor %}</select></td></tr>
 
 <tr><td>Select from medium targets:</td>
-<td><select name="target_choice_med" onChange=goTo(document.target_select.target_choice_med.options[document.target_select.target_choice_med.selectedIndex].value) style="width: 90px">
+<td><select name="target_choice_med" onChange=goTo(document.target_select.target_choice_med.options[document.target_select.target_choice_med.selectedIndex].value) style="width: 80px">
+<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 {% for complex in Medium %}
 	<option value={{ complex.name }}>{{ complex.name }}</option>
 {% endfor %}</select></td></tr>
 
 <tr><td>Select from difficult targets:</td>
-<td><select name="target_choice_diff" onChange=goTo(document.target_select.target_choice_diff.options[document.target_select.target_choice_diff.selectedIndex].value) style="width: 90px">
+<td><select name="target_choice_diff" onChange=goTo(document.target_select.target_choice_diff.options[document.target_select.target_choice_diff.selectedIndex].value) style="width: 80px">
+<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 {% for complex in Difficult %}
 	<option value={{ complex.name }}>{{ complex.name }}</option>
 {% endfor %}</select></td></tr>
-</form></table>
+</form></table><br><br>
 
-<a href="{% url 'method' %}">View information on docking methods</a><br><br>
+<h2><span class="model_search">Model search</span></h2>
 
-<a href="{% url 'summary' '1BGX' %}">View summary of data</a><br><br>
-
-<a href="{% url 'scoring' 'PISA' '1BGX' '10' %}">View summary of scoring functions</a><br><br>
-
-<a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' '10' %}">View information on refinement</a>
-
-<h2>Model search</h2><form method='POST'>{% csrf_token %}
+<form method='POST'>{% csrf_token %}
 <table class="table">{{ form.as_table }}</table>
 <input type="submit" value="Submit" /></form>
 

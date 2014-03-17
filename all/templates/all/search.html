@@ -48,7 +48,22 @@
 <a href="{% url 'refinement' 'ZDOCK' 'FiberDock' '1ACB' '10' %}">View information on refinement</a>
 
 <h2>Model search</h2><form method='POST'>{% csrf_token %}
-<table class="table">{{ form.as_table }}</table>
+<table id='model_search_table' class="table">{{ form.as_table }}</table>
 <input type="submit" value="Submit" /></form>
+<script>
+$('#model_search_table [value="All_ranks"]').click(function(){
+	if(this.checked){
+		$('#model_search_table [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+	}
+	else{
+		$('#model_search_table [name="capri_rank"]').not('[value="All_ranks"]').removeAttr('disabled');
+	};
+});
+$(document).ready(function(){
+	$('#model_search_table [value="All_ranks"]').prop('checked',true);
+	$('#model_search_table [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+});
+</script>
+
 
 {% endblock %}

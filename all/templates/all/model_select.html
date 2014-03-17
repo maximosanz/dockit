@@ -12,14 +12,19 @@
 <thead>
 <tr>
 <th data-priority="1" class="th.target.name" data-placeholder="e.g. '1ACB'">Target</th>
-<th data-priority="3" class="th.target.difficulty" data-placeholder="e.g. 'Rigid'">Difficulty</th>
-<th data-priority="2" class="th.method.name" data-placeholder="e.g. 'ZDOCK or Hex'">Method</th>
-<th data-priority="2" class="th.refinement.name" data-placeholder="e.g. '!Nothing'">Refinement</th>
-<th data-priority="1" class="th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
-<th data-priority="4" class="columnSelector-false" data-placeholder="e.g. '<15'">L-RMSD</th>
-<th data-priority="4" class="columnSelector-false" data-placeholder="e.g. '<4'">R-RMSD</th>
-<th data-priority="3" class="th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th data-priority="1" class="th.number" data-placeholder="e.g. <=5">Method rank</th>
+<th data-priority="3" class="filter-select th.target.difficulty">Difficulty</th>
+<th data-priority="2" class="filter-select th.method.name">Method</th>
+<th data-priority="2" class="filter-select columnSelector-false th.refinement.name">Refinement</th>
+<th data-priority="1" class="columnSelector-false th.i_rmsd" data-placeholder="e.g. '<=8'">I-RMSD</th>
+<th data-priority="4" class="columnSelector-false th.l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th data-priority="4" class="columnSelector-false th.r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th data-priority="3" class="columnSelector-false th.fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th data-priority="3" class="sorter-capri_rank filter-select th.capri_rank">CAPRI Rank</th>
+<th data-priority="5" class="columnSelector-false th.dasa" data-placeholder="e.g. '<5000'">&#916;ASA</th>
+<th data-priority="5" class="columnSelector-false th.no_clashes" data-placeholder="e.g. '<60'">No. of clashes</th>
 <th data-priority="5" class="columnSelector-false th.i_l_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="6" class="columnSelector-false th.target.complex" data-placeholder="e.g. '1BGX'">Complex PDB ID</th>
 <th data-priority="6" class="columnSelector-false th.target.receptor" data-placeholder="e.g. '1BVL'">Receptor PDB ID</th>
 <th data-priority="6" class="columnSelector-false th.target.ligand" data-placeholder="e.g. '3LZT'">Ligand PDB ID</th>
 </tr>
@@ -29,18 +34,23 @@
 {% for model in results %}
 <tr class="bodytr">
 <td class="td.target.name"><a href="{% url 'target_info' model.target__name %}">{{ model.target__name }}</a></td>
+<td class="td.number">{{ model.number }}</td>
 <td class="td.target.difficulty">{{ model.target__difficulty }}</td>
-<td class="td.method.name">{{ model.method__name }}</td>
-<td class="td.refinement.name" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">{{ model.refinement__name }}</td>
+<td class="td.method.name" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">{{ model.method__name }}</td>
+<td class="td.refinement.name">{{ model.refinement__name }}</td>
 <td class="td.i_rmsd">{{ model.i_rmsd }}</td>
 <td class="td.l_rmsd">{{ model.l_rmsd }}</td>
 <td class="td.r_rmsd">{{ model.r_rmsd }}</td>
 <td class="td.fnat">{{ model.fnat }}</td>
+<td class="td.capri_rank">{{ model.capri_rank }}</td>
+<td class="td.dasa">{{ model.dasa }}</td>
+<td class="td.no_clashes">{{ model.no_clashes }}</td>
 <td class="td.i_l_rmsd">{{ model.i_l_rmsd }}</td>
+<td class="td.target.complex"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__complex }}">{{ model.target__complex }}</a></td>
 <td class="td.target.receptor"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__receptor }}">{{ model.target__receptor }}</a></td>
 <td class="td.target.ligand"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__ligand }}">{{ model.target__ligand }}</a></td>
 <td class="td.viewmodel"><a href="{% url 'model' model.id %}">View model</a></td>
-<td class="td.viewallmodels" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;"><a href="{% url 'target_models' model.target__name 'All' 'All' 0 0 0 0 %}">View all models for {{model.target__name}}</a></td>
+<td class="td.viewallmodels" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;"><a href="{% url 'target_models' model.target__name 'All' 'All' 0 0 0 0 1 %}">View all models for {{model.target__name}}</a></td>
 </tr>
 {% endfor %}
 </tbody>
@@ -61,12 +71,7 @@
   </form>
 </div>
 <br>
-<p>Download table as CSV file:</p>
-<form>
-<input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table
-<input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells
-</form><br>
-<div id="downloadify"></div><br>
+
 <a href="{% url 'search' %}">Back to search</a><br>
 
 <style id="css">
@@ -99,47 +104,6 @@ $('#popover')
 
 });
 </script>
-<script>
 
-$(document).ready(function(){
-    Downloadify.create('downloadify',{
-	swf: Django.static("downloadify/media/downloadify.swf"),
-	filename: "docking_models.csv",
-	data: function(){
-		var csv = [];
-		if(document.getElementById('downloadcsv_all').checked) {
-			var selection = $('#model_select_table').find('tbody tr');
-			var headselection = $('#model_select_table thead th');
-			var cells = 'td';
-		}
-		else if(document.getElementById('downloadcsv_onlyvisible').checked) {
-			var selection = $('#model_select_table').find('tbody tr:visible');
-			var headselection = $('#model_select_table thead th:visible');
-			var cells = 'td:visible';
-		};
-		var headrow=[];
-		headselection.each(function(){
-			headrow.push( $(this).text() );
-		});
-		csv.push( headrow.join(',') );		
-		selection.each(function(){
-			var row = [];
-			$(this).find(cells).not('.td\\.viewallmodels').not('.td\\.viewmodel').each(function(){
-				row.push( $(this).text() );
-			});
-			csv.push( row.join(',') )
-    		});
-		var csv_text=csv.join('\n');
-		return csv_text;
-	},
-	downloadImage: Django.static("downloadify/images/download.png"),
-	width: 175,
-	height: 30,
-    onError: function(){ 
-      alert('No visible cells'); 
-    },
-    });
-});
-</script>
 
 {% endblock %}

@@ -22,7 +22,9 @@ class model_select_form(forms.Form):
 	for r in Refinement.objects.all():
 		refinement_options.append([r.name,r.name])
 	refinement = forms.ChoiceField(choices=refinement_options)
-	i_rmsd_threshold = forms.DecimalField(label='Maximum I-RMSD', initial=0)
-	l_rmsd_threshold = forms.DecimalField(label='Maximum L-RMSD', initial=0)
-	r_rmsd_threshold = forms.DecimalField(label='Maximum R-RMSD', initial=0)
-	fnat_threshold = forms.DecimalField(label='Minimum fraction of natural contacts', initial=0)
+	i_rmsd_threshold = forms.DecimalField(required=False,label='Maximum I-RMSD')
+	l_rmsd_threshold = forms.DecimalField(required=False,label='Maximum L-RMSD')
+	r_rmsd_threshold = forms.DecimalField(required=False,label='Maximum R-RMSD')
+	fnat_threshold = forms.DecimalField(required=False,label='Minimum fraction of natural contacts')
+	capri_ranks=(('All_ranks','All'),('Incorrect','Incorrect'),('Acceptable','Acceptable'),('Medium','Medium'),('High','High'),('Removed','Removed'))
+	capri_rank = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,choices=capri_ranks)

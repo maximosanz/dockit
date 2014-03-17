@@ -63,16 +63,16 @@ Jmol.script(jmolApplet0,"display displayed or */"+i+";");
 }}
 //change what is visible to account for selection
 if (what_is_visible=="5A") {
-Jmol.script(jmolApplet0,"display displayed and {"+"{{ ref_int_5A_residues }}"+"};");
-//Jmol.script(jmolApplet0,"display displayed and {"+"{{ ref_int_5A_residues }}"+" or "+"{{ inp_int_5A_residues }}"+"};");
+//Jmol.script(jmolApplet0,"display displayed and {"+"{{ ref_int_5A_residues }}"+"};");
+Jmol.script(jmolApplet0,"display displayed and {"+"{{ ref_int_5A_residues }}"+" or "+"{{ inp_int_5A_residues }}"+"};");
 } else if (what_is_visible=="10A") {
 Jmol.script(jmolApplet0,"display displayed and {"+"{{ ref_int_10A_residues }}"+" or "+"{{ inp_int_10A_residues }}"+"}; color TRANSLUCENT 0.7; color {"+"{{ ref_int_5A_residues }}"+"} OPAQUE;");
 }
 //change how 5A interface residues are viewed
 if (int_res_visualisation=="ball_and_stick") {
-Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; wireframe on");
+Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; wireframe 0.15; spacefill 20%; color wireframe cpk; color balls cpk;");
 } else if (int_res_visualisation=="space_fill") {
-Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; spacefill on");
+Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; spacefill on; color balls TRANSLUCENT 0.7 cpk");
 }}
 </script><br></td>
 

@@ -27,15 +27,15 @@
 </thead>
 <tbody>
 {% for model in results %}
-<tr class="bodytr" name="{{ model.id }}">
+<tr class="bodytr" name="{{ model.id }}" onMouseOver="create_tooltip('{{ model.id }}','{{ model.target__name }}','{{ model.target__difficulty }}','{{ model.method__name }}','{{ model.refinement__name }}','{{ model.i_rmsd }}','{{ model.l_rmsd }}','{{ model.r_rmsd }}','{{ model.fnat }}','{{ model.i_l_rmsd }}');">
 <td class="td.modelcheckbox" style="width:40px"><center><input name="results/{{ model.method__name_lower }}/{{ model.refinement__name_lower }}/{{ model.target__difficulty_lower }}/{{ model.target__name }}/{{ model.target__name }}_{{ model.method__name_lower }}_{{ model.refinement__name_lower }}_{{ model.number }}.pdb-{{ model.target__receptor_bound_chain }}-fitted" class="modelcheckbox select_model" type="checkbox"></center></td>
-<td class="td.method.name" style='width:160px'>{{ model.method__name }}</td>
-<td class="td.refinement.name" style='width:135px'>{{ model.refinement__name }}</td>
-<td class="td.i_rmsd">{{ model.i_rmsd }}</td>
-<td class="td.l_rmsd">{{ model.l_rmsd }}</td>
-<td class="td.r_rmsd">{{ model.r_rmsd }}</td>
-<td class="td.fnat" style='width:100px'>{{ model.fnat }}</td>
-<td class="td.i_l_rmsd">{{ model.i_l_rmsd }}</td>
+<td class="td.method.name row_id_{{ model.id }}" style='width:160px'>{{ model.method__name }}</td>
+<td class="td.refinement.name row_id_{{ model.id }}" style='width:135px'>{{ model.refinement__name }}</td>
+<td class="td.i_rmsd row_id_{{ model.id }}">{{ model.i_rmsd }}</td>
+<td class="td.l_rmsd row_id_{{ model.id }}">{{ model.l_rmsd }}</td>
+<td class="td.r_rmsd row_id_{{ model.id }}">{{ model.r_rmsd }}</td>
+<td class="td.fnat row_id_{{ model.id }}" style='width:100px'>{{ model.fnat }}</td>
+<td class="td.i_l_rmsd row_id_{{ model.id }}">{{ model.i_l_rmsd }}</td>
 <td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}" class="view_model">View model</a></td>
 </tr>
 {% endfor %}
@@ -221,7 +221,32 @@ $(document).ready(function(){
       alert('No visible cells'); 
     },
     });
-});</script>
+});
+
+//if model id is not in list of tooltips already created, create the tooltip
+var opentip_formatting = { target:true, style:"dark", stem:"false", tipJoint:"top left", targetJoint:"bottom left" };
+var created_tooltip_list = [];
+
+function create_tooltip(model_id,target_name,target_difficulty,method_name,refinement_name,i_rmsd,l_rmsd,r_rmsd,fnat,i_l_rmsd) {
+if ($.inArray(model_id, created_tooltip_list) == -1) {
+	$(".row_id_"+model_id).each( function() {
+	var tooltip = new Opentip($(this), opentip_formatting);
+	var content = "<b>Model details</b><br><br>";
+	content += "<table style=\"border-collapse: separate; border-spacing: 8px;\"><tr><td>Target</td><td>"+target_name+"</td></tr>";
+	content += "<tr><td>Difficulty</td><td>"+target_difficulty+"</td></tr>";
+	content += "<tr><td>Method</td><td>"+method_name+"</td></tr>";
+	content += "<tr><td>Refinement</td><td>"+refinement_name+"</td></tr>";
+	content += "<tr><td>I-RMSD</td><td>"+i_rmsd+"</td></tr>";
+	content += "<tr><td>L-RMSD</td><td>"+l_rmsd+"</td></tr>";
+	content += "<tr><td>R-RMSD</td><td>"+r_rmsd+"</td></tr>";
+	content += "<tr><td>Fnat</td><td>"+fnat+"</td></tr>";
+	content += "<tr><td>I-L-RMSD</td><td>"+i_l_rmsd+"</td></tr></table>";
+	tooltip.setContent(content);
+	});
+	created_tooltip_list.push(model_id);
+}
+};
+</script>
 
 <p><a href="{% url 'search' %}">Back to search</a></p>
 {% endblock %}

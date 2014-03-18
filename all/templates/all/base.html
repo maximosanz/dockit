@@ -47,9 +47,9 @@
 <!--call tablesorter on .tablesorter tables-->
 <script src="{% static "tablesorter_function.js" %}"></script>
 
-<!--downloadify-->
+<!--downloadify-
 <script src="{% static "downloadify/src/downloadify.js" %}"></script>
-<script src="{% static "downloadify/js/swfobject.js" %}"></script>
+<script src="{% static "downloadify/js/swfobject.js" %}"></script>-->
 
 
 <!--script for target dropdown in navbar-->
@@ -139,7 +139,7 @@ padding-top: 60px;
           <a href="#" class="dropdown-toggle model" data-toggle="dropdown">Model<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <form method='POST'>{% csrf_token %}
-            <table class="table" style="width:500px;border-collapse:separate;border-spacing:10px">{{ form.as_table }}
+            <table id="model_search_dropdown" class="table" style="width:500px;border-collapse:separate;border-spacing:10px">{{ form.as_table }}
             <tr><td></td><td><input type="submit" value="Submit" /></td></tr></table></form>
           </ul>
         </li>
@@ -156,6 +156,21 @@ padding-top: 60px;
   </div>
 </nav>
 
+<!--script to disable/enable capri_rank checkboxes on the dropdown if the "All" category is selected-->
+<script>
+$('#model_search_dropdown [value="All_ranks"]').click(function(){
+	if(this.checked){
+		$('#model_search_dropdown [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+	}
+	else{
+		$('#model_search_dropdown [name="capri_rank"]').not('[value="All_ranks"]').removeAttr('disabled');
+	};
+});
+$(document).ready(function(){
+	$('#model_search_dropdown [value="All_ranks"]').prop('checked',true);
+	$('#model_search_dropdown [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+});
+</script>
 <!--script to stop dropdown collapsing on click of target select-->
 <script type="text/javascript">
     $('.dropdown-menu table, .dropdown-menu label').click(function(e) {

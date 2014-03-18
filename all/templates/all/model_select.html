@@ -12,14 +12,19 @@
 <thead>
 <tr>
 <th data-priority="1" class="th.target.name pdb_id" data-placeholder="e.g. '1ACB'">Target</th>
-<th data-priority="3" class="th.target.difficulty difficulty" data-placeholder="e.g. 'Rigid'">Difficulty</th>
-<th data-priority="2" class="th.method.name method" data-placeholder="e.g. 'ZDOCK or Hex'">Method</th>
-<th data-priority="2" class="th.refinement.name refinement" data-placeholder="e.g. '!Nothing'">Refinement</th>
-<th data-priority="1" class="th.i_rmsd i_rmsd_model" data-placeholder="e.g. '<=8'">I-RMSD</th>
-<th data-priority="4" class="columnSelector-false l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
-<th data-priority="4" class="columnSelector-false r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
-<th data-priority="3" class="th.fnat fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th data-priority="1" class="th.number" data-placeholder="e.g. <=5">Method rank</th>
+<th data-priority="3" class="filter-select th.target.difficulty difficulty">Difficulty</th>
+<th data-priority="2" class="filter-select th.method.name method">Method</th>
+<th data-priority="2" class="filter-select columnSelector-false th.refinement.name refinement">Refinement</th>
+<th data-priority="1" class="columnSelector-false th.i_rmsd i_rmsd_model" data-placeholder="e.g. '<=8'">I-RMSD</th>
+<th data-priority="4" class="columnSelector-false th.l_rmsd l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th data-priority="4" class="columnSelector-false th.r_rmsd r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th data-priority="3" class="columnSelector-false th.fnat fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
+<th data-priority="3" class="sorter-capri_rank filter-select th.capri_rank">CAPRI Rank</th>
+<th data-priority="5" class="columnSelector-false th.dasa" data-placeholder="e.g. '<5000'">&#916;ASA</th>
+<th data-priority="5" class="columnSelector-false th.no_clashes" data-placeholder="e.g. '<60'">No. of clashes</th>
 <th data-priority="5" class="columnSelector-false th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="6" class="columnSelector-false th.target.complex" data-placeholder="e.g. '1BGX'">Complex PDB ID</th>
 <th data-priority="6" class="columnSelector-false th.target.receptor rec_pdb_id" data-placeholder="e.g. '1BVL'">Receptor PDB ID</th>
 <th data-priority="6" class="columnSelector-false th.target.ligand lig_pdb_id" data-placeholder="e.g. '3LZT'">Ligand PDB ID</th>
 </tr>
@@ -29,18 +34,23 @@
 {% for model in results %}
 <tr class="bodytr" onMouseOver="create_tooltip('{{ model.id }}','{{ model.target__name }}','{{ model.target__difficulty }}','{{ model.method__name }}','{{ model.refinement__name }}','{{ model.i_rmsd }}','{{ model.l_rmsd }}','{{ model.r_rmsd }}','{{ model.fnat }}','{{ model.i_l_rmsd }}','{{ model.target__receptor }}','{{ model.target__ligand }}');">
 <td class="td.target.name row_id_{{ model.id }}"><a href="{% url 'target_info' model.target__name %}">{{ model.target__name }}</a></td>
+<td class="td.number row_id_{{ model.id }}">{{ model.number }}</td>
 <td class="td.target.difficulty row_id_{{ model.id }}">{{ model.target__difficulty }}</td>
-<td class="td.method.name row_id_{{ model.id }}">{{ model.method__name }}</td>
-<td class="td.refinement.name row_id_{{ model.id }}" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">{{ model.refinement__name }}</td>
+<td class="td.method.name row_id_{{ model.id }}" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;">{{ model.method__name }}</td>
+<td class="td.refinement.name row_id_{{ model.id }}">{{ model.refinement__name }}</td>
 <td class="td.i_rmsd row_id_{{ model.id }}">{{ model.i_rmsd }}</td>
 <td class="td.l_rmsd row_id_{{ model.id }}">{{ model.l_rmsd }}</td>
 <td class="td.r_rmsd row_id_{{ model.id }}">{{ model.r_rmsd }}</td>
 <td class="td.fnat row_id_{{ model.id }}">{{ model.fnat }}</td>
+<td class="td.capri_rank row_id_{{ model.id }}">{{ model.capri_rank }}</td>
+<td class="td.dasa row_id_{{ model.id }}">{{ model.dasa }}</td>
+<td class="td.no_clashes row_id_{{ model.id }}">{{ model.no_clashes }}</td>
 <td class="td.i_l_rmsd row_id_{{ model.id }}">{{ model.i_l_rmsd }}</td>
+<td class="td.target.complex row_id_{{ model.id }}"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__complex }}">{{ model.target__complex }}</a></td>
 <td class="td.target.receptor row_id_{{ model.id }}"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__receptor }}">{{ model.target__receptor }}</a></td>
 <td class="td.target.ligand row_id_{{ model.id }}"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__ligand }}">{{ model.target__ligand }}</a></td>
 <td class="td.viewmodel"><a href="{% url 'model' model.id %}" class="view_model">View model</a></td>
-<td class="td.viewallmodels" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;"><a href="{% url 'target_models' model.target__name 'All' 'All' 0 0 0 0 %}" class="view_target">View all models for {{model.target__name}}</a></td>
+<td class="td.viewallmodels" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;"><a href="{% url 'target_models' model.target__name 'All' 'All' 0 0 0 0 1 %}" class="view_target">View all models for {{model.target__name}}</a></td>
 </tr>
 {% endfor %}
 </tbody>
@@ -61,12 +71,7 @@
   </form>
 </div>
 <br>
-<p>Download table as CSV file:</p>
-<form>
-<input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table
-<input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells
-</form><br>
-<div id="downloadify"></div><br>
+
 <a href="{% url 'search' %}">Back to search</a><br>
 
 <style id="css">
@@ -98,10 +103,8 @@ $('#popover')
 
 
 });
-</script>
-<script>
 
-$(document).ready(function(){
+/*$(document).ready(function(){
     Downloadify.create('downloadify',{
 	swf: Django.static("downloadify/media/downloadify.swf"),
 	filename: "docking_models.csv",
@@ -139,7 +142,7 @@ $(document).ready(function(){
       alert('No visible cells'); 
     },
     });
-});
+});*/
 
 //if model id is not in list of tooltips already created, create the tooltip
 var opentip_formatting = { target:true, style:"dark", stem:"false", tipJoint:"top left", targetJoint:"bottom left" };

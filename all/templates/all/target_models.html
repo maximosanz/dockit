@@ -16,25 +16,33 @@
 <thead>
 <tr>
 <th data-priority="critical" class="filter-false sorter-false th.selectmodel select_model">Select</th>
+<th data-priority="1" class="th.number" data-placeholder="e.g. <=5">Method rank</th>
 <th data-priority="1" class="filter-select th.method.name method">Method</th>
 <th data-priority="2" class="filter-select th.refinement.name refinement">Refinement</th>
 <th data-priority="3" class="th.i_rmsd i_rmsd_model" data-placeholder="e.g. '<=8'">I-RMSD</th>
-<th data-priority="4" class="th.l_rmsd l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
-<th data-priority="5" class="th.r_rmsd r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
+<th data-priority="4" class="columnSelector-false th.l_rmsd l_rmsd" data-placeholder="e.g. '<15'">L-RMSD</th>
+<th data-priority="5" class="columnSelector-false th.r_rmsd r_rmsd" data-placeholder="e.g. '<4'">R-RMSD</th>
 <th data-priority="3" class="th.fnat fnat" data-placeholder="e.g. '>0.5'">Fnat</th>
-<th data-priority="5" class="th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="3" class="sorter-capri_rank filter-select th.capri_rank">CAPRI Rank</th>
+<th data-priority="5" class="columnSelector-false th.dasa" data-placeholder="e.g. '<5000'">&#916;ASA</th>
+<th data-priority="5" class="columnSelector-false th.no_clashes" data-placeholder="e.g. '<60'">No. of clashes</th>
+<th data-priority="5" class="columnSelector-false th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
 </tr>
 </thead>
 <tbody>
 {% for model in results %}
 <tr class="bodytr" name="{{ model.id }}" onMouseOver="create_tooltip('{{ model.id }}','{{ model.target__name }}','{{ model.target__difficulty }}','{{ model.method__name }}','{{ model.refinement__name }}','{{ model.i_rmsd }}','{{ model.l_rmsd }}','{{ model.r_rmsd }}','{{ model.fnat }}','{{ model.i_l_rmsd }}');">
 <td class="td.modelcheckbox" style="width:40px"><center><input name="results/{{ model.method__name_lower }}/{{ model.refinement__name_lower }}/{{ model.target__difficulty_lower }}/{{ model.target__name }}/{{ model.target__name }}_{{ model.method__name_lower }}_{{ model.refinement__name_lower }}_{{ model.number }}.pdb-{{ model.target__receptor_bound_chain }}-fitted" class="modelcheckbox select_model" type="checkbox"></center></td>
+<td class="td.number">{{ model.number }}</td>
 <td class="td.method.name row_id_{{ model.id }}" style='width:160px'>{{ model.method__name }}</td>
 <td class="td.refinement.name row_id_{{ model.id }}" style='width:135px'>{{ model.refinement__name }}</td>
 <td class="td.i_rmsd row_id_{{ model.id }}">{{ model.i_rmsd }}</td>
 <td class="td.l_rmsd row_id_{{ model.id }}">{{ model.l_rmsd }}</td>
 <td class="td.r_rmsd row_id_{{ model.id }}">{{ model.r_rmsd }}</td>
 <td class="td.fnat row_id_{{ model.id }}" style='width:100px'>{{ model.fnat }}</td>
+<td class="td.capri_rank">{{ model.capri_rank }}</td>
+<td class="td.dasa">{{ model.dasa }}</td>
+<td class="td.no_clashes">{{ model.no_clashes }}</td>
 <td class="td.i_l_rmsd row_id_{{ model.id }}">{{ model.i_l_rmsd }}</td>
 <td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}" class="view_model">View model</a></td>
 </tr>
@@ -57,13 +65,14 @@
   </form>
 </div>
 <br>
-<table class="table" style="width:600px;">
+
+<!-- <table class="table" style="width:600px;">
 <tr><td colspan="2">Download table as CSV file:</td></tr>
 <form>
 <tr><td style="width:300px;"><input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table</td>
 <td style="width:300px;"><input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells</td></tr>
 </form>
-<tr><td colspan="2"><div id="downloadify" style="visibility:hidden;"></td></tr></div></table>
+<tr><td colspan="2"><div id="downloadify" style="visibility:hidden;"></td></tr></div></table> -->
 
 <table class="table" style="width:600px;">
 <tr><td>Change JSmol view</td></tr>
@@ -183,7 +192,7 @@ JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300p
 
 <script>
 $(document).ready(re_render());
-$(document).ready(function(){
+/*$(document).ready(function(){
     Downloadify.create('downloadify',{
 	swf: Django.static("downloadify/media/downloadify.swf"),
 	filename: "docking_models.csv",
@@ -222,6 +231,7 @@ $(document).ready(function(){
     },
     });
 });
+*/
 
 //if model id is not in list of tooltips already created, create the tooltip
 var opentip_formatting = { target:true, style:"dark", stem:"false", tipJoint:"top left", targetJoint:"bottom left" };

@@ -77,8 +77,7 @@ input += "select */1; color translucent 0.7 "+rec_colours[0]+";";
 input += "select */2; color translucent 0.7 "+lig_colours[0]+";";
 input += "select {"+"{{ model_rec_chains }}"+"}; color translucent 0.7 "+rec_colours[1]+";";
 input += "select {"+"{{ model_lig_chains }}"+"}; color translucent 0.7 "+lig_colours[1]+";";
-//input += "color {"+ref_int_10A_residues+"} OPAQUE; select all; display {"+"{{ model_rec_chains }} or {{ model_lig_chains }}"+"};";
-input += "color {"+ref_int_10A_residues+"} OPAQUE; select all; display all;";
+input += "color {"+ref_int_10A_residues+" or "+inp_int_10A_residues+"} OPAQUE; select all; display all;";
 input += "{{ ref_draw_5A_contacts }} {{ inp_draw_5A_contacts }} draw OFF;";
 //create JSMol window
 jmolApplet0 = Jmol.getApplet("jmolApplet0", info);
@@ -91,20 +90,24 @@ Jmol.script(jmolApplet0,"select all; color TRANSLUCENT 0.7; color {"+ref_int_10A
 //make models visible as required
 for (var i=1;i<=4;i++) {
 if (vis_array[i-1]==true) {
-Jmol.script(jmolApplet0,"display displayed or */"+i+";");
-}}
+	if (i <= 2) {
+	Jmol.script(jmolApplet0,"display displayed or */"+i+";");
+	} else if (i == 3) {
+	Jmol.script(jmolApplet0,"select { {{ model_rec_chains }} }; display displayed or selected;");
+	} else {
+	Jmol.script(jmolApplet0,"select { {{ model_lig_chains }} }; display displayed or selected;");
+}}}
 //change what is visible to account for selection
 if (what_is_visible=="5A") {
-Jmol.script(jmolApplet0,"display displayed and {"+ref_int_5A_residues+"};");
-//Jmol.script(jmolApplet0,"display displayed and {"+ref_int_5A_residues+" or "+inp_int_5A_residues+"};");
+Jmol.script(jmolApplet0,"select { "+ref_int_5A_residues+" or "+inp_int_5A_residues+" }; display displayed and selected;");
 } else if (what_is_visible=="10A") {
-Jmol.script(jmolApplet0,"display displayed and {"+ref_int_10A_residues+" or "+inp_int_10A_residues+"}; color TRANSLUCENT 0.7; color {"+ref_int_5A_residues+"} OPAQUE;");
+Jmol.script(jmolApplet0,"select { "+ref_int_10A_residues+" or "+inp_int_10A_residues+" }; display displayed and selected; color TRANSLUCENT 0.7; color {"+ref_int_5A_residues+" or "+inp_int_5A_residues+"} OPAQUE;");
 }
 //change how 5A interface residues are viewed
 if (int_res_visualisation=="ball_and_stick") {
-Jmol.script(jmolApplet0,"select {"+ref_int_5A_residues+"}; wireframe on");
+Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; wireframe 0.15; spacefill 20%; color wireframe cpk; color balls cpk;");
 } else if (int_res_visualisation=="space_fill") {
-Jmol.script(jmolApplet0,"select {"+ref_int_5A_residues+"}; spacefill on");
+Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; spacefill on; select { {{ model_rec_chains }} }; color balls "+rec_colours[1]+"; select { {{ model_lig_chains }} }; color balls "+lig_colours[1]+"; color balls TRANSLUCENT 0.7");
 }}
 </script><br></td>
 

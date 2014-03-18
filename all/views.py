@@ -24,7 +24,7 @@ def target_info(request, name):
 	#interactions = extract_interactions(static('bench_contacts/'+target.name+'_caprifit-contacts.out'),False)
 	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','ru':'benchmarks/'+target.name+'_r_u_cleanedup.pdb','lu':'benchmarks/'+target.name+'_l_u_cleanedup.pdb'}
 	#unbound interface residues and contacts inputted as empty to avoid drawing them (may change this)
-        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':"",'inp_int_5A_residues':"",'inp_int_10A_residues':"",'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
+        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
         return insert_form_and_go(request, 'all/target_info.html', context)
 
 def search(request):
@@ -131,14 +131,19 @@ def scoring(request, scorer, target, cutoff):
 def model(request, id):
 	#details on a particular model
         model = Model.objects.get(id=id)
-	file_names = {'rb':'benchmarks/'+model.target.name+'_r_b.pdb','lb':'benchmarks/'+model.target.name+'_l_b.pdb','model':'results/'+model.method.name.lower()+'/'+model.refinement.name.lower()+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+model.refinement.name.lower()+'_'+str(model.number)+'.pdb-'+model.target.receptor_bound_chain+'-fitted'}
+	if (model.refinement.name == "-"):
+		refinement = "nothing"
+	else:
+		refinement = model.refinement.name.lower()
+
+	file_names = {'rb':'benchmarks/'+model.target.name+'_r_b.pdb','lb':'benchmarks/'+model.target.name+'_l_b.pdb','model':'results/'+model.method.name.lower()+'/'+refinement+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+refinement+'_'+str(model.number)+'.pdb-'+model.target.receptor_bound_chain+'-fitted'}
 
 	#get chain information to allow visualisation of receptor/ligand separately
 	model_rec_chains = "*:"+"/3.1 or *:".join(list(model.target.receptor_bound_chain))+"/3.1"
 	model_lig_chains = "*:"+"/3.1 or *:".join(list(model.target.ligand_bound_chain))+"/3.1"
 
 	#needs changing from absolute filepath
-	interactions = extract_interactions('/project/data/dockit/static/results/'+model.method.name.lower()+'/'+model.refinement.name.lower()+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+model.refinement.name.lower()+'_'+str(model.number)+'_caprifit-contacts.out',True)
+	interactions = extract_interactions('/project/data/dockit/static/results/'+model.method.name.lower()+'/'+refinement+'/'+model.target.difficulty.lower()+'/'+model.target.name+'/'+model.target.name+'_'+model.method.name.lower()+'_'+refinement+'_'+str(model.number)+'_caprifit-contacts.out',True)
 
 	def get_score(scorer):
 		if (len(Score.objects.filter(model__id=id,scoring_function__name=scorer)) > 0):

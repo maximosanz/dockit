@@ -1,8 +1,11 @@
 {% extends 'all/base.html' %}{% block title %}Model select{% endblock %}
 {% block content %}
 {% django_js jquery=false %}
+{% load static from staticfiles %}
 
-<h1>Model search results</h1>
+<h1>Model search results</h1><br>
+
+<form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button>&nbsp;&nbsp;Download the complete table with all models in the database as a CSV file</form><br>
 
 <button id="popover" type="button" class="btn btn-default">
   Select Columns
@@ -50,18 +53,18 @@
 <td class="td.target.receptor"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__receptor }}">{{ model.target__receptor }}</a></td>
 <td class="td.target.ligand"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__ligand }}">{{ model.target__ligand }}</a></td>
 <td class="td.viewmodel"><a href="{% url 'model' model.id %}">View model</a></td>
-<td class="td.viewallmodels" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;"><a href="{% url 'target_models' model.target__name 'All' 'All' 0 0 0 0 1 %}">View all models for {{model.target__name}}</a></td>
+<td class="td.viewallmodels" style="white-space: nowrap; overflow: hidden; text-overflow:ellipsis;"><a href="{% url 'model_select' model.target__name 'All' 'All' 0 0 0 0 1 0 %}">View models for {{model.target__name}}</a></td>
 </tr>
 {% endfor %}
 </tbody>
 </table>
 <div id="ts-pager" class="ts-pager">
   <form>
-    <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
-    <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
+    <img src="{% static "tablesorter/addons/pager/icons/first.png" %}" class="first">
+    <img src="{% static "tablesorter/addons/pager/icons/prev.png" %}" class="prev">
     <span class="pagedisplay"></span>
-    <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
-    <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
+    <img src="{% static "tablesorter/addons/pager/icons/next.png" %}" class="next">
+    <img src="{% static "tablesorter/addons/pager/icons/last.png" %}" class="last">
     <select class="pagesize">
       <option selected="selected" value="10">10</option>
       <option value="20">20</option>

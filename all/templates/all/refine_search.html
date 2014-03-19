@@ -1,0 +1,73 @@
+{% extends 'all/base.html' %}{% block title %}Refine search{% endblock %}
+{% block content %}
+{% django_js jquery=false %}
+{% load static from staticfiles %}
+
+<h1>Please refine your search</h1>
+<div style='display:none;' id="model_search_refine">
+<p><big>Your search returned <b>{{ count }}</b> models<br>
+Displaying more than 1000 results will significantly affect the page's performance</big></p>
+<br>
+<table class="toptable">
+<tr><td><input type="submit" value="Proceed Regardless" /></td><td>Note that the page may take several minutes to load</td></tr>
+<tr><td><form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button></form></td><td>Download the complete table with all models in the database as a CSV file</td></tr>
+</table>
+</div>
+
+<div style='display:none;' id="target_search_refine">
+<p><big><b>{{ count }}</b> models were found for target {{ target }}<br>
+Displaying more than 1000 results will significantly affect the page's performance</big></p>
+<br>
+<table class="toptable">
+<tr><td><input type="submit" value="Proceed Regardless" /></td><td>Note that the page may take several minutes to load</td></tr>
+<tr><td><form method="get" action="{% static "csv/"|add:target|add:"_models.csv" %}"><button type="submit">Download data for {{ target }} models</button></form></td><td>Download the complete table with all models for {{ target }} as a CSV file</td></tr>
+<tr><td><form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button></form></td><td>Download the complete table with all models as a CSV file</td></tr>
+</table>
+</div>
+
+
+
+
+
+
+<h2>Refine search</h2><form method='POST'>{% csrf_token %}
+<table id='refine_search_table' class="table">{{ initiated_form.as_table }}</table>
+<input type="submit" value="Submit" /></form>
+
+<script>
+$('#refine_search_table [value="All_ranks"]').click(function(){
+	if(this.checked){
+		$('#refine_search_table [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+	}
+	else{
+		$('#refine_search_table [name="capri_rank"]').not('[value="All_ranks"]').removeAttr('disabled');
+	};
+});
+
+$('.toptable [value="Proceed Regardless"]').click(function(){
+	window.location.href = Django.url('model_select', {'target':'{{ target }}','method':'{{ method }}','refinement':'{{ refinement }}', 'i_rmsd_threshold':'{{ i_rmsd_threshold }}', 'l_rmsd_threshold':'{{ l_rmsd_threshold }}', 'r_rmsd_threshold':'{{ r_rmsd_threshold }}', 'fnat_threshold':'{{ fnat_threshold }}', 'rank_str':'{{ rank_str }}', 'bypass':'1'});
+});
+
+$(document).ready(function(){
+	if($('#refine_search_table [value="All_ranks"]').attr('checked')){
+		$('#refine_search_table [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+	}
+	var target_array = ['All','Rigid','Medium','Difficult']
+	if(target_array.indexOf('{{ target }}') != -1){
+		$('#model_search_refine').show();
+	}
+	else{
+		$('#target_search_refine').show();
+	}
+});
+</script>
+<style>
+table.toptable
+{
+border-collapse:separate;
+border-spacing:15px 10px;
+}
+</style>
+
+
+{% endblock %}

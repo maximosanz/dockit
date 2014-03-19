@@ -44,11 +44,6 @@
 <!--call tablesorter on .tablesorter tables-->
 <script src="{% static "tablesorter_function.js" %}"></script>
 
-<!--downloadify-->
-<script src="{% static "downloadify/src/downloadify.js" %}"></script>
-<script src="{% static "downloadify/js/swfobject.js" %}"></script>
-
-
 <!--script for target dropdown in navbar-->
 <script>
 function goTo(name) {
@@ -158,9 +153,11 @@ $('#model_search_dropdown [value="All_ranks"]').click(function(){
 	};
 });
 $(document).ready(function(){
-	$('#model_search_dropdown [value="All_ranks"]').prop('checked',true);
-	$('#model_search_dropdown [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+	if($('#model_search_dropdown [value="All_ranks"]').attr('checked')){
+		$('#model_search_dropdown [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');
+	}
 });
+
 </script>
 <!--script to stop dropdown collapsing on click of target select-->
 <script type="text/javascript">

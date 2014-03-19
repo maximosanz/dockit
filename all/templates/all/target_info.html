@@ -3,7 +3,7 @@
 {% load static from staticfiles %}
 
 <div class="page-header">
-<h1>{{ target.name }} target details <small><a href="">View models</a></small></h1>
+<h1>{{ target.name }} target details <small><a href="{% url 'model_select' target.name 'All' 'All' 0 0 0 0 1 0 %}">View models</a></small></h1>
 </div>
 
 <table class="table"><tr>

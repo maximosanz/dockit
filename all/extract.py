@@ -78,11 +78,11 @@ def extract_interactions(writecon_filepath,one_pdb):
 	#construct commands to draw 5A contacts
 	ref_draw_5A_contacts = ""
 	for i in range(len(ref_rec_5A_contacts)):
-		ref_draw_5A_contacts += "draw arrow"+str(i)+" arrow ("+ref_rec_5A_contacts[i]+") ("+ref_lig_5A_contacts[i]+"); color $arrow"+str(i)+" TRANSLUCENT 0.5;"
+		ref_draw_5A_contacts += "draw arrow"+str(i)+"r arrow ("+ref_rec_5A_contacts[i]+") ("+ref_lig_5A_contacts[i]+"); color $arrow"+str(i)+"r TRANSLUCENT 0.5;"
 
 	inp_draw_5A_contacts = ""
 	for i in range(len(inp_rec_5A_contacts)):
-		inp_draw_5A_contacts += "draw arrow"+str(i)+" arrow ("+inp_rec_5A_contacts[i]+") ("+inp_lig_5A_contacts[i]+"); color $arrow"+str(i)+" TRANSLUCENT 0.5 purple;"
+		inp_draw_5A_contacts += "draw arrow"+str(i)+"m arrow ("+inp_rec_5A_contacts[i]+") ("+inp_lig_5A_contacts[i]+"); color $arrow"+str(i)+"m TRANSLUCENT 0.5 purple;"
 
 	#construct list of 5A interface residues for reference
 	ref_int_5A_residues = ""

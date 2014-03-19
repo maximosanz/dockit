@@ -37,7 +37,7 @@
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
 	<td><div class="dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
-	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 %}">View models</a></td>
+	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 1 %}">View models</a></td>
 	</tr>
 {% endfor %}
 </table>
@@ -68,7 +68,7 @@
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
 	<td><div class="dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
-	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 %}">View models</a></td>
+	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 1 %}">View models</a></td>
 	</tr>
 {% endfor %}
 </table>
@@ -99,7 +99,7 @@
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
 	<td><div class="dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
-	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 %}">View models</a></td>
+	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 1 %}">View models</a></td>
 	</tr>
 {% endfor %}
 </table>

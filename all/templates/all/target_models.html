@@ -169,7 +169,7 @@ if (models_selected.length > 10) {
 	load_files += "; CARTOON only; frame ALL; {{ hide_rec_chains }}; display displayed or (model=1.1); color (model=1.1) red; color (model=2.1) blue;";
 
 	for (var i=0; i<models_selected.length; i++) {
-		load_files += " color (model="+(i+3)+".1) "+colour_array[i]+";";
+		load_files += " color (model="+(i+3)+".1) translucent 0.4 "+colour_array[i]+";";
 	}
 	Jmol.script(jmolApplet0,load_files);
 }

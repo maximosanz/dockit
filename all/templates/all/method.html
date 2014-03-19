@@ -2,11 +2,158 @@
 {% block content %}
 {% load static from staticfiles %}
 
-<div class="page-header">
-<h1>Docking methods <small>Some text</small></h1>
+<div class="page-header" id="docking">
+<h1>Methods</h1>
 </div>
 
-This page will have information on each docking method, links to papers etc..
+This page gives information on the methods used to produce and score docking models.<br><br>
 
-<a href="{% url 'search' %}">Back to start</a>
+<a href="#scoring">Skip to scoring methods</a>
+
+<h2>Docking methods</h2>
+
+<table class="table">
+
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Performance in CAPRI<sup><a href="#references">1</a>,<a href="#references">2</a></sup></th>
+<th>Link to web server</th>
+<th>Link to paper</th>
+</tr>
+
+<tr>
+<td>ClusPro</td>
+<td>Docking using PIPER, a Fast Fourier Transform (FFT) method. Four types of scoring functions are available - balanced, electrostatic favoured, hydrophobic favoured and VdW+electrostatic. Hierarchical clustering is performed on the top 1000 structures and the centers of the x largest clusters given out, where x is 10 by default.</td>
+<td>1<sup>st</sup> (CAPRI5), 1<sup>st</sup> (CAPRI4)</td>
+<td><a href="http://cluspro.bu.edu/login.php" target="_blank">http://cluspro.bu.edu/login.php</a></td>
+<td><a href="http://onlinelibrary.wiley.com/doi/10.1002/prot.24403/abstract" target="_blank">http://onlinelibrary.wiley.com/doi/10.1002/prot.24403/abstract</a></td>
+</tr>
+
+<tr>
+<td>Hex</td>
+<td>A FFT method. Each molecule is modelled using 3D expansions of real orthogonal spherical polar basis functions to encode both surface shape and electrostatic charge and potential distributions.</td>
+<td>5<sup>th</sup> (CAPRI5)</td>
+<td><a href="http://hex.loria.fr/" target="_blank">http://hex.loria.fr/</a></td>
+<td><a href="http://nar.oxfordjournals.org/content/38/suppl_2/W445" target="_blank">http://nar.oxfordjournals.org/content/38/suppl_2/W445</a></td>
+</tr>
+
+<tr>
+<td>ZDOCK</td>
+<td>Shape complementarity, desolvation and electrostatics optimised using FFT. Target functions are highly-tolerant of conformational changes on binding.</td>
+<td>-</td>
+<td><a href="http://zlab.umassmed.edu/zdock/" target="_blank">http://zlab.umassmed.edu/zdock/</a></td>
+<td><a href="http://onlinelibrary.wiley.com/doi/10.1002/prot.10092/pdf" target="_blank">http://onlinelibrary.wiley.com/doi/10.1002/prot.10092/pdf</a></td>
+</tr>
+
+<tr>
+<td>PATCHDOCK</td>
+<td>Based on object recognition and image segmentation techniques. Looks for complementary shapes by identifying concave and convex patches and fitting them together. Ranks models based on geometric complementarity.</td>
+<td>11<sup>th</sup> (CAPRI5)</td>
+<td><a href="http://bioinfo3d.cs.tau.ac.il/PatchDock/" target="_blank">http://bioinfo3d.cs.tau.ac.il/PatchDock/</a></td>
+<td><a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1160241/?tool=pubmed" target="_blank">http://www.ncbi.nlm.nih.gov/pmc/articles/PMC1160241/?tool=pubmed</a></td>
+</tr>
+
+<tr>
+<td>FIBERDOCK</td>
+<td>Backbone flexibility is modelled by an unlimited number of normal modes, hence accounting for small scale conformational changes. The structures of flexible proteins are iteratively minimised along the most relevant nodes.</td>
+<td>6<sup>th</sup> (CAPRI5), 2<sup>nd</sup> (CAPRI4)</td>
+<td><a href="http://bioinfo3d.cs.tau.ac.il/FiberDock/" target="_blank">http://bioinfo3d.cs.tau.ac.il/FiberDock/</a></td>
+<td><a href="http://onlinelibrary.wiley.com/doi/10.1002/prot.22668/full" target="_blank">http://onlinelibrary.wiley.com/doi/10.1002/prot.22668/full</a></td>
+</tr>
+
+<tr>
+<td>FIREDOCK</td>
+<td>Each rigid-body input is refined by restricted interface side-chain rearrangement and by soft rigid-body optimization. The relative position of the docking partners is refined by Monte Carlo minimization of the binding score function, which is used to rank solutions.</td>
+<td>3<sup>rd</sup> (CAPRI4)</td>
+<td><a href="http://bioinfo3d.cs.tau.ac.il/FireDock/" target="_blank">http://bioinfo3d.cs.tau.ac.il/FireDock/</a></td>
+<td><a href="http://www.ncbi.nlm.nih.gov/pubmed/18424796" target="_blank">http://www.ncbi.nlm.nih.gov/pubmed/18424796</a></td>
+</tr>
+
+<tr>
+<td>Rosetta</td>
+<td>A low-resolution, rigid-body, Monte Carlo search is followed by simultaneous Monte Carlo minimization of backbone displacement and side-chain conformations.</td>
+<td>-</td>
+<td><a href="http://rosie.rosettacommons.org/" target="_blank">http://rosie.rosettacommons.org/</a></td>
+<td><a href="http://graylab.jhu.edu/publications/2003JMB.pdf" target="_blank">http://graylab.jhu.edu/publications/2003JMB.pdf</a></td>
+</tr>
+
+</table>
+
+<a href="#docking" id="scoring">Back to top</a>
+
+<h2>Scoring methods</h2>
+
+<table class="table">
+
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Performance in Moal <i>et al.</i> (2013)<sup><a href="#references">3</a></sup></th>
+<th>Link to paper</th>
+</tr>
+
+<tr>
+<td>ZRANK</td>
+<td></td>
+<td>34<sup>th</sup></td>
+<td></td>
+</tr>
+
+<tr>
+<td>ZRANK2</td>
+<td></td>
+<td>1<sup>st</sup></td>
+<td></td>
+</tr>
+
+<tr>
+<td>PISA</td>
+<td></td>
+<td>8<sup>th</sup></td>
+<td></td>
+</tr>
+
+<tr>
+<td>SPIDER</td>
+<td></td>
+<td>38<sup>th</sup></td>
+<td></td>
+</tr>
+
+</table>
+
+<span id="references">References:</span>
+
+<ol>
+<li></li>
+<li></li>
+<li></li>
+</ol>
+
+<a href="#docking">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="{% url 'search' %}">Back to search</a>
 {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

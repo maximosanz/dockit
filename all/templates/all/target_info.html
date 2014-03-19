@@ -28,7 +28,7 @@
 <td><span class="lig_description">{{ target.ligand_description }}</span></td>
 </tr><tr>
 <td><span class="i_rmsd">I-RMSD</span></td>
-<td><span class="i_rmsd"></span></td>
+<td><span class="i_rmsd">{{ target.i_rmsd }}</span></td>
 </tr><tr>
 <td><span class="dasa">DASA</span></td>
 <td><span class="dasa"></span></td>
@@ -110,7 +110,7 @@ Change how much of the complex is visible:<br>
 </form><br>
 
 <form name="int_res_changer" onSubmit="return false">
-Change how the 5 &#8491; interface residues are viewed:<br>
+Change how the native 5 &#8491; interface residues are viewed:<br>
 <input type="radio" name="int_res_select" onClick='change_int_res("cartoon")' checked>&nbsp;View as cartoon<br>
 <input type="radio" name="int_res_select" onClick='change_int_res("ball_and_stick")'>&nbsp;View as ball and stick<br>
 <input type="radio" name="int_res_select" onClick='change_int_res("space_fill")'>&nbsp;View as space-filling spheres<br>

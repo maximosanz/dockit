@@ -71,10 +71,11 @@ console: "jmolApplet0_infodiv",
 };
 </script>
 
-<!--account for navbar-->
+<!--account for navbar, give space at bottom-->
 <style>
 body {
 padding-top: 60px;
+padding-bottom: 40px;
 }
 </style>
 
@@ -139,8 +140,9 @@ padding-top: 60px;
           <a href="#" class="dropdown-toggle model" data-toggle="dropdown">Model<b class="caret"></b></a>
           <ul class="dropdown-menu">
             <form method='POST'>{% csrf_token %}
-            <table id="model_search_dropdown" class="table" style="width:500px;border-collapse:separate;border-spacing:10px">{{ form.as_table }}
+            <table id="model_search_dropdown" class="table" style="width:500px;border-collapse:separate;border-spacing:10px">{{ form.difficulty }}
             <tr><td></td><td><input type="submit" value="Submit" /></td></tr></table></form>
+		
           </ul>
         </li>
 	<li><a class="methods" href="{% url 'method' %}">Methods</a></li>

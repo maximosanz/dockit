@@ -267,6 +267,7 @@ def insert_form_and_go(request,template,context):
 	else:
 		form = model_select_form(request.POST)
 		if form.is_valid():
+			print "got here"
 		        target = form.cleaned_data['target']
 		        method = form.cleaned_data['method']
 			refinement = form.cleaned_data['refinement']
@@ -297,7 +298,6 @@ def insert_form_and_go(request,template,context):
 						rank_str+="1"
 					else:
 						rank_str+="0"
-					
 			return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str}))
 	context['Target'] = Target.objects.all()
 	context['Rigid'] = Target.objects.filter(difficulty='Rigid')

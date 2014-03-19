@@ -27,4 +27,5 @@ class model_select_form(forms.Form):
 	r_rmsd_threshold = forms.DecimalField(required=False,label='Maximum R-RMSD')
 	fnat_threshold = forms.DecimalField(required=False,label='Minimum fraction of natural contacts')
 	capri_ranks=(('All_ranks','All'),('Incorrect','Incorrect'),('Acceptable','Acceptable'),('Medium','Medium'),('High','High'),('Removed','Removed'))
-	capri_rank = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,choices=capri_ranks)
+	capri_rank = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple,choices=capri_ranks, initial=['All_ranks'])
+

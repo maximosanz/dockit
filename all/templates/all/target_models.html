@@ -1,12 +1,15 @@
-{% extends 'all/base.html' %}{% block title %}{{ target.name }} models{% endblock %}
+{% extends 'all/base.html' %}{% block title %}{{ target.name }} Models{% endblock %}
 {% block content %}
 {% django_js jquery=false %}
+{% load static from staticfiles %}
+<h1>{{ target.name }} models</h1>
 
-<div class="page-header">
-<h1>{{ target.name }} models <small><a href="{% url 'target_info' target.name %}" class="view_target">View target details</a></small></h1>
-</div>
+<table class="toptable">
+<tr><td><form method="get" action="{% static "csv/"|add:target.name|add:"_models.csv" %}"><button type="submit">Download data for {{ target.name }} models</button></form></td><td>Download the complete table with all models for {{ target.name }} as a CSV file</td></tr>
+<tr><td><form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button></form></td><td>Download the complete table with all models as a CSV file</td></tr>
+</table><br>
 
-<a href="{% url 'search' %}">Back to search</a><br><br>
+<p><a href="{% url 'target_info' target.name %}">View target details</a></p><br>
 
 <button id="popover" type="button" class="btn btn-default">
   Select Columns
@@ -51,11 +54,11 @@
 </table>
 <div id="ts-pager" class="ts-pager">
   <form>
-    <img src="/static/tablesorter/addons/pager/icons/first.png" class="first"/>
-    <img src="/static/tablesorter/addons/pager/icons/prev.png" class="prev"/>
+    <img src="{% static "tablesorter/addons/pager/icons/first.png" %}" class="first"/>
+    <img src="{% static "tablesorter/addons/pager/icons/prev.png" %}" class="prev"/>
     <span class="pagedisplay"></span>
-    <img src="/static/tablesorter/addons/pager/icons/next.png" class="next"/>
-    <img src="/static/tablesorter/addons/pager/icons/last.png" class="last"/>
+    <img src="{% static "tablesorter/addons/pager/icons/next.png" %}" class="next"/>
+    <img src="{% static "tablesorter/addons/pager/icons/last.png" %}" class="last"/>
     <select class="pagesize">
       <option selected="selected" value="10">10</option>
       <option value="20">20</option>
@@ -65,14 +68,6 @@
   </form>
 </div>
 <br>
-
-<!-- <table class="table" style="width:600px;">
-<tr><td colspan="2">Download table as CSV file:</td></tr>
-<form>
-<tr><td style="width:300px;"><input type="radio" id="downloadcsv_all" name="downloadcsv" value="all" checked>Complete table</td>
-<td style="width:300px;"><input type="radio" id="downloadcsv_onlyvisible" name="downloadcsv" value="onlyvisible">Only visible cells</td></tr>
-</form>
-<tr><td colspan="2"><div id="downloadify" style="visibility:hidden;"></td></tr></div></table> -->
 
 <table class="table" style="width:600px;">
 <tr><td>Change JSmol view</td></tr>
@@ -192,46 +187,6 @@ JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300p
 
 <script>
 $(document).ready(re_render());
-/*$(document).ready(function(){
-    Downloadify.create('downloadify',{
-	swf: Django.static("downloadify/media/downloadify.swf"),
-	filename: "docking_models.csv",
-	data: function(){
-		var csv = [];
-		if(document.getElementById('downloadcsv_all').checked) {
-			var selection = $('#target_models_table').find('tbody tr');
-			var headselection = $('#target_models_table thead th');
-			var cells = 'td';
-		}
-		else if(document.getElementById('downloadcsv_onlyvisible').checked) {
-			var selection = $('#target_models_table').find('tbody tr:visible');
-			var headselection = $('#target_models_table thead th:visible');
-			var cells = 'td:visible';
-		};
-		var headrow=[];
-		headselection.not('.th\\.selectmodel').each(function(){
-			headrow.push( $(this).text() );
-		});
-		csv.push( headrow.join(',') );		
-		selection.each(function(){
-			var row = [];
-			$(this).find(cells).not('.td\\.modelcheckbox').not('.td\\.viewmodel').each(function(){
-				row.push( $(this).text() );
-			});
-			csv.push( row.join(',') )
-    		});
-		var csv_text=csv.join('\n');
-		return csv_text;
-	},
-	downloadImage: Django.static("downloadify/images/download.png"),
-	width: 175,
-	height: 30,
-    onError: function(){ 
-      alert('No visible cells'); 
-    },
-    });
-});
-*/
 
 //if model id is not in list of tooltips already created, create the tooltip
 var opentip_formatting = { target:true, style:"dark", stem:"false", tipJoint:"top left", targetJoint:"bottom left" };
@@ -257,6 +212,13 @@ if ($.inArray(model_id, created_tooltip_list) == -1) {
 }
 };
 </script>
+<style>
+table.toptable
+{
+border-collapse:separate;
+border-spacing:15px 10px;
+}
+</style>
 
 <p><a href="{% url 'search' %}">Back to search</a></p>
 {% endblock %}

@@ -1,8 +1,10 @@
 # Create your views here.
 
+from django.contrib import messages
 from django.db.models import Q
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 from all.models import Target, Method, Model, Refinement, ScoringFunction, Score
 from django.core.urlresolvers import reverse
 from all.forms import model_select_form
@@ -78,7 +80,11 @@ def summary(request,target):
 	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds,'acceptable_by_method':acceptable_by_method}
 	return insert_form_and_go(request,'all/summary.html',context)
 
-def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str):
+def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str, bypass):
+	if bypass=='0':
+		bypass =False
+	else:
+		bypass=True
 	i_rmsd_threshold = float(re.sub('-', '.', i_rmsd_threshold))
 	l_rmsd_threshold = float(re.sub('-', '.', l_rmsd_threshold))
 	r_rmsd_threshold = float(re.sub('-', '.', r_rmsd_threshold))
@@ -111,25 +117,30 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 		results = results.filter(method__name=method)
 	if refinement != 'All':
 		results = results.filter(refinement__name=refinement)
-	results=results.values('id','number','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','target__complex','target__ligand','target__receptor','capri_ev','capri_valid','no_clashes','asa_c','asa_rl')
-	if not results:
-		return insert_form_and_go(request, 'all/noresults.html', {})
+	count=results.count()
+	if count>1000 and not bypass:
+		context = {'results':results, 'count':count}
+		return HttpResponseRedirect(reverse('refine_search',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_t':i_rmsd_threshold, 'l_rmsd_t':l_rmsd_threshold, 'r_rmsd_t':r_rmsd_threshold, 'fnat_t':fnat_threshold, 'rank_str':rank_str,'count':count}))
 	else:
-		context = {'results':results}
-		capri_ranks=['Incorrect','Acceptable','Medium','High']
-		for model in results:
-			model['method__name_lower']=model['method__name'].lower()
-			model['refinement__name_lower']=model['refinement__name'].lower()
-			model['target__difficulty_lower']=model['target__difficulty'].lower()
-			model['dasa']=model['asa_rl']-model['asa_c']
-			if model['capri_valid'] == 0:
-				model['capri_rank']='Removed'
-			else:
-				model['capri_rank']=capri_ranks[model['capri_ev']]
-		if target not in ['All', 'Rigid', 'Medium', 'Difficult']:
-			return HttpResponseRedirect(reverse('target_models',kwargs={'name':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str}))
+		results=results.values('id','number','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','target__complex','target__ligand','target__receptor','capri_ev','capri_valid','no_clashes','asa_c','asa_rl')
+		if not results:
+			return insert_form_and_go(request, 'all/noresults.html', {})
 		else:
-			return insert_form_and_go(request, 'all/model_select.html', context)
+			context = {'results':results}
+			capri_ranks=['Incorrect','Acceptable','Medium','High']
+			for model in results:
+				model['method__name_lower']=model['method__name'].lower()
+				model['refinement__name_lower']=model['refinement__name'].lower()
+				model['target__difficulty_lower']=model['target__difficulty'].lower()
+				model['dasa']=model['asa_rl']-model['asa_c']
+				if model['capri_valid'] == 0:
+					model['capri_rank']='Removed'
+				else:
+					model['capri_rank']=capri_ranks[model['capri_ev']]
+			if target not in ['All', 'Rigid', 'Medium', 'Difficult']:
+				return HttpResponseRedirect(reverse('target_models',kwargs={'name':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str}))
+			else:
+				return insert_form_and_go(request, 'all/model_select.html', context)
 
 def scoring(request, scorer, target, cutoff):
 	#comparison of scoring functions
@@ -260,6 +271,74 @@ def noresults(request):
 	#reached if no results match a search
 	return insert_form_and_go(request, 'all/noresults.html', {})
 
+def refine_search(request, target, method, refinement, i_rmsd_t, l_rmsd_t, r_rmsd_t, fnat_t, rank_str, count):
+	#reached if too many results to display
+
+	i_rmsd_threshold = float(re.sub('-', '.', i_rmsd_t))
+	if i_rmsd_threshold == 0.0:
+		i_rmsd_threshold=None
+	l_rmsd_threshold = float(re.sub('-', '.', l_rmsd_t))
+	if l_rmsd_threshold == 0.0:
+		l_rmsd_threshold=None
+	r_rmsd_threshold = float(re.sub('-', '.', r_rmsd_t))
+	if r_rmsd_threshold == 0.0:
+		r_rmsd_threshold=None
+	fnat_threshold = float(re.sub('-', '.', fnat_t))
+	if fnat_threshold == 0.0:
+		fnat_threshold=None
+	possible_ranks=['Incorrect','Acceptable','Medium','High','Removed']
+	if rank_str != "1":
+		capri_ranks=[]
+		for i in range(5):
+			if rank_str[i]=="1":
+				capri_ranks.append(possible_ranks[i])
+	else:
+		capri_ranks=['All_ranks']
+#	temp="csv/"+target+"_models.csv"
+	if request.method == 'GET':
+		initiated_form = model_select_form(initial={'target':target,'method':method,'refinement':refinement,'i_rmsd_threshold':i_rmsd_threshold,'l_rmsd_threshold':l_rmsd_threshold,'r_rmsd_threshold':r_rmsd_threshold,'fnat_threshold':fnat_threshold,'capri_rank':capri_ranks})
+		context={'count':count,'initiated_form':initiated_form,'target':target,'method':method,'refinement':refinement,'i_rmsd_threshold':i_rmsd_t,'l_rmsd_threshold':l_rmsd_t,'r_rmsd_threshold':r_rmsd_t,'fnat_threshold':fnat_t,'rank_str':rank_str}
+		return insert_form_and_go(request, 'all/refine_search.html', context)
+
+	else:
+		initiated_form = model_select_form(request.POST)
+		if initiated_form.is_valid():
+		        target = initiated_form.cleaned_data['target']
+		        method = initiated_form.cleaned_data['method']
+			refinement = initiated_form.cleaned_data['refinement']
+			capri_rank = initiated_form.cleaned_data['capri_rank']
+			i_rmsd_t = str(initiated_form.cleaned_data['i_rmsd_threshold'])
+			i_rmsd_threshold = re.sub('\.', '-', i_rmsd_t)
+			if i_rmsd_threshold == "None":
+				i_rmsd_threshold = "0"
+			l_rmsd_t = str(initiated_form.cleaned_data['l_rmsd_threshold'])
+			l_rmsd_threshold = re.sub('\.', '-', l_rmsd_t)
+			if l_rmsd_threshold == "None":
+				l_rmsd_threshold = "0"
+			r_rmsd_t = str(initiated_form.cleaned_data['r_rmsd_threshold'])
+			r_rmsd_threshold = re.sub('\.', '-', r_rmsd_t)
+			if r_rmsd_threshold == "None":
+				r_rmsd_threshold = "0"
+			fnat_t = str(initiated_form.cleaned_data['fnat_threshold'])
+			fnat_threshold = re.sub('\.', '-', fnat_t)
+			if fnat_threshold == "None":
+				fnat_threshold = "0"
+			possible_ranks=['Incorrect','Acceptable','Medium','High','Removed']
+			if "All_ranks" in capri_rank:
+				rank_str='1'
+			else:
+				rank_str=""
+				for option in possible_ranks:
+					if option in capri_rank:
+						rank_str+="1"
+					else:
+						rank_str+="0"
+
+			return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str, 'bypass':'0'}))
+
+
+
+
 def insert_form_and_go(request,template,context):
 	#inserts the model select form onto every page and renders the page
 	if request.method == 'GET':
@@ -298,7 +377,7 @@ def insert_form_and_go(request,template,context):
 						rank_str+="1"
 					else:
 						rank_str+="0"
-			return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str}))
+			return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str, 'bypass':'0'}))
 	context['Target'] = Target.objects.all()
 	context['Rigid'] = Target.objects.filter(difficulty='Rigid')
 	context['Medium'] = Target.objects.filter(difficulty='Medium')

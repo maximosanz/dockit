@@ -3,7 +3,7 @@
 {% load static from staticfiles %}
 
 <div class="page-header">
-<h1>{{ target.name }} target details <small><a href="{% url 'model_select' target.name 'All' 'All' 0 0 0 0 1 0 %}">View models</a></small></h1>
+<h1>{{ target.name }} target details <small><a href="{% url 'model_select' target.name 'All' 'All' 0 0 0 0 1 0 %}" class="view_models">View models</a></small></h1>
 </div>
 
 <table class="table"><tr>
@@ -31,7 +31,7 @@
 <td><span class="i_rmsd">{{ target.i_rmsd }}</span></td>
 </tr><tr>
 <td><span class="dasa">DASA</span></td>
-<td><span class="dasa"></span></td>
+<td><span class="dasa">{{ dasa }}</span></td>
 </tr></table>
 
 <table name="layout_table"><tr><td class="jsmol">
@@ -71,7 +71,7 @@ Jmol.script(jmolApplet0,"select { {{ ref_int_10A_residues }} or {{ inp_int_10A_r
 if (int_res_visualisation=="ball_and_stick") {
 Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; wireframe 0.15; spacefill 20%; color wireframe cpk; color balls cpk;");
 } else if (int_res_visualisation=="space_fill") {
-Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; spacefill on; select */1; color balls "+rec_colours[0]+"; select */2; color balls "+lig_colours[0]+"; color balls TRANSLUCENT 0.7");
+Jmol.script(jmolApplet0,"select {"+"{{ ref_int_5A_residues }}"+"}; spacefill on; select */1; color balls "+rec_colours[0]+"; select */2; color balls "+lig_colours[0]+"; select all; color balls TRANSLUCENT 0.7;");
 }}
 </script><br></td>
 

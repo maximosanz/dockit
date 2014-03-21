@@ -22,12 +22,13 @@ def target(request):
 def target_info(request, name):
 	#details on a particular target
 	target = Target.objects.get(name=name)
+	dasa = target.asa_rl_b - target.asa_c_b
 	#need to change from absolute filepath
 	interactions = extract_interactions('/project/data/dockit/static/bench_contacts/'+target.name+'_caprifit-contacts.out',False)
 	#interactions = extract_interactions(static('bench_contacts/'+target.name+'_caprifit-contacts.out'),False)
 	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','ru':'benchmarks/'+target.name+'_r_u_cleanedup.pdb','lu':'benchmarks/'+target.name+'_l_u_cleanedup.pdb'}
 	#unbound interface residues and contacts inputted as empty to avoid drawing them (may change this)
-        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
+        context = {'target':target,'dasa':dasa,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
         return insert_form_and_go(request, 'all/target_info.html', context)
 
 def search(request):
@@ -55,29 +56,59 @@ def summary(request,target):
 	#get data for method comparison graph
 	methods = []
 	irmsd_by_method = []
-	acceptable_by_method = []
+	acceptable_by_method_500 = []
+	acceptable_by_method_100 = []
+	acceptable_by_method_10 = []
 	
 	#averages across all targets need only be calculated once - here temporarily
-	average_irmsds = [5.20,12.68,2.78,5.75,5.75,6.44,6.21,7.54,9.02]
-
-	for each in Method.objects.all():
-		methods.append(each.name)
-		try:
-			ordered_models = Model.objects.filter(target__name=target,method__name=each.name,number__lte=500).order_by('i_rmsd')
-			irmsd_by_method.append(ordered_models[0].i_rmsd)
-			
-		except:
+	#average_irmsds = [5.20,12.68,2.78,5.75,5.75,6.44,6.21,7.54,9.02]
+	
+	models = Model.objects.filter(target__name=target).values('number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
+	
+	#produces a readable name for method and refinement
+	def get_field_name(method,refinement):
+		if (refinement == '-' or refinement == 'Rosetta'):
+			field_name = method
+		else:
+			field_name = method + ' then ' + refinement
+		return field_name
+	
+	#construct method and refinement array
+	for model in models:
+		field_name = get_field_name(model['method__name'],model['refinement__name'])
+		if field_name not in methods:
+			methods.append(field_name)
 			irmsd_by_method.append(0)
+			acceptable_by_method_500.append(0)
+			acceptable_by_method_100.append(0)
+			acceptable_by_method_10.append(0)
 
-		try:
-			no_acceptables = Model.objects.filter(target__name=target,method__name=each.name,number__lte=500,capri_ev__gt=0).count()
-			acceptable_by_method.append(no_acceptables)
+	#construct arrays of values
+	for model in models:
+		field_name = get_field_name(model['method__name'],model['refinement__name'])
+		for i in range(len(methods)):
+			if (methods[i] == field_name):
+				if (model['capri_valid'] == 1 and model['capri_ev'] > 0):
+					if (model['number'] <= 10):
+						acceptable_by_method_500[i] += 1
+						acceptable_by_method_100[i] += 1
+						acceptable_by_method_10[i] += 1
+					elif (model['number'] <= 100):
+						acceptable_by_method_500[i] += 1
+						acceptable_by_method_100[i] += 1
+					elif (model['number'] <= 500):
+						acceptable_by_method_500[i] += 1
+				if (irmsd_by_method[i] == 0 or irmsd_by_method[i] > model['i_rmsd']):
+					irmsd_by_method[i] = model['i_rmsd']
+				break;
+	
+	at_least_one = False;
+	for method in acceptable_by_method_500:
+		if (method > 0):
+			at_least_one = True;
+			break;
 
-		except:
-			acceptable_by_method.append(0)
-			print(each.name)
-
-	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'average_irmsds':average_irmsds,'acceptable_by_method':acceptable_by_method}
+	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'at_least_one':at_least_one}
 	return insert_form_and_go(request,'all/summary.html',context)
 
 def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str, bypass):
@@ -165,6 +196,9 @@ def scoring(request, scorer, target, cutoff):
 def model(request, id):
 	#details on a particular model
         model = Model.objects.get(id=id)
+	
+	dasa = model.asa_rl - model.asa_c
+	
 	if (model.refinement.name == "-"):
 		refinement = "nothing"
 	else:
@@ -189,7 +223,7 @@ def model(request, id):
 	zrank2_score = get_score('ZRANK2')
 	pisa_score = get_score('PISA')
 
-        context = {'model':model,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score}
+        context = {'model':model,'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=",'dasa':dasa,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score}
         return insert_form_and_go(request, 'all/model.html', context)
 
 def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str):
@@ -242,7 +276,94 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 			model['refinement__name_lower'] = "nothing"
 		else:
 			model['refinement__name_lower'] = model['refinement__name'].lower()
-	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':results}
+
+	#get data for method comparison graph
+	target_difficulty = target.difficulty
+	methods = []
+	irmsd_by_method = []
+	acceptable_by_method_500 = []
+	acceptable_by_method_100 = []
+	acceptable_by_method_10 = []
+	medium_by_method_500 = []
+	medium_by_method_100 = []
+	medium_by_method_10 = []
+	high_by_method_500 = []
+	high_by_method_100 = []
+	high_by_method_10 = []
+
+	models = Model.objects.filter(target__name=name).values('number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
+	
+	#produces a readable name for method and refinement
+	def get_field_name(method,refinement):
+		if (refinement == '-' or refinement == 'Rosetta'):
+			field_name = method
+		else:
+			field_name = method + ' then ' + refinement
+		return field_name
+	
+	#construct method and refinement array
+	for model in models:
+		field_name = get_field_name(model['method__name'],model['refinement__name'])
+		if field_name not in methods:
+			methods.append(field_name)
+			irmsd_by_method.append(0)
+			acceptable_by_method_500.append(0)
+			acceptable_by_method_100.append(0)
+			acceptable_by_method_10.append(0)
+			medium_by_method_500.append(0)
+			medium_by_method_100.append(0)
+			medium_by_method_10.append(0)
+			high_by_method_500.append(0)
+			high_by_method_100.append(0)
+			high_by_method_10.append(0)
+
+	#construct arrays of values
+	for model in models:
+		field_name = get_field_name(model['method__name'],model['refinement__name'])
+		for i in range(len(methods)):
+			if (methods[i] == field_name and model['capri_valid'] == 1):
+				if (model['capri_ev'] == 1):
+					if (model['number'] <= 10):
+						acceptable_by_method_500[i] += 1
+						acceptable_by_method_100[i] += 1
+						acceptable_by_method_10[i] += 1
+					elif (model['number'] <= 100):
+						acceptable_by_method_500[i] += 1
+						acceptable_by_method_100[i] += 1
+					elif (model['number'] <= 500):
+						acceptable_by_method_500[i] += 1
+				elif (model['capri_ev'] == 2):
+					if (model['number'] <= 10):
+						medium_by_method_500[i] += 1
+						medium_by_method_100[i] += 1
+						medium_by_method_10[i] += 1
+					elif (model['number'] <= 100):
+						medium_by_method_500[i] += 1
+						medium_by_method_100[i] += 1
+					elif (model['number'] <= 500):
+						medium_by_method_500[i] += 1
+				elif (model['capri_ev'] == 3):
+					if (model['number'] <= 10):
+						high_by_method_500[i] += 1
+						high_by_method_100[i] += 1
+						high_by_method_10[i] += 1
+					elif (model['number'] <= 100):
+						high_by_method_500[i] += 1
+						high_by_method_100[i] += 1
+					elif (model['number'] <= 500):
+						high_by_method_500[i] += 1
+				if (irmsd_by_method[i] == 0 or irmsd_by_method[i] > model['i_rmsd']):
+					if (model['capri_valid'] == 1):
+						irmsd_by_method[i] = model['i_rmsd']
+				break;
+	
+	at_least_one = False;
+	for method in acceptable_by_method_500:
+		if (method > 0):
+			at_least_one = True;
+			break;
+
+	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':results,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'medium_by_method_500':medium_by_method_500,'medium_by_method_100':medium_by_method_100,'medium_by_method_10':medium_by_method_10,'high_by_method_500':high_by_method_500,'high_by_method_100':high_by_method_100,'high_by_method_10':high_by_method_10,'at_least_one':at_least_one}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	
 

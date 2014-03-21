@@ -35,9 +35,9 @@
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
-	<td><div class="dasa"></div></td>
+	<td><div class="dasa" id="{{ complex.name }}_dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
-	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 1 %}">View models</a></td>
+	<td class="view_models" style="width: 100px"><a href="{% url 'model_select' complex.name 'All' 'All' 0 0 0 0 1 0 %}">View models</a></td>
 	</tr>
 {% endfor %}
 </table>
@@ -66,9 +66,9 @@
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
-	<td><div class="dasa"></div></td>
+	<td><div class="dasa" id="{{ complex.name }}_dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
-	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 1 %}">View models</a></td>
+	<td class="view_models" style="width: 100px"><a href="{% url 'model_select' complex.name 'All' 'All' 0 0 0 0 1 0 %}">View models</a></td>
 	</tr>
 {% endfor %}
 </table>
@@ -97,15 +97,32 @@
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
-	<td><div class="dasa"></div></td>
+	<td><div class="dasa" id="{{ complex.name }}_dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
-	<td class="view_models" style="width: 100px"><a href="{% url 'target_models' complex.name 'All' 'All' 0 0 0 0 1 %}">View models</a></td>
+	<td class="view_models" style="width: 100px"><a href="{% url 'model_select' complex.name 'All' 'All' 0 0 0 0 1 0 %}">View models</a></td>
 	</tr>
 {% endfor %}
 </table>
 
 <a href="#" class="top">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="{% url 'search' %}" class="home">Back to search</a>
+
+<script>
+var dasa;
+
+$(document).ready( function() {
+
+{% for complex in Target %}
+
+dasa = ({{ complex.asa_rl_b }} - {{ complex.asa_c_b }}).toFixed(1);
+
+document.getElementById('{{ complex.name }}_dasa').innerHTML = String(dasa);
+
+{% endfor %}
+
+});
+</script>
+
 {% endblock %}
 
 

@@ -4,14 +4,16 @@
 {% load static from staticfiles %}
 <h1>{{ target.name }} models</h1>
 
-<table class="toptable">
+<p><a href="{% url 'target_info' target.name %}">View target details</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="#visualisation">Skip to visualisation</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="#graphs">Skip to method comparison</a></p>
+
+<br><table class="toptable">
 <tr><td><form method="get" action="{% static "csv/"|add:target.name|add:"_models.csv" %}"><button type="submit">Download data for {{ target.name }} models</button></form></td><td>Download the complete table with all models for {{ target.name }} as a CSV file</td></tr>
 <tr><td><form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button></form></td><td>Download the complete table with all models as a CSV file</td></tr>
 </table><br>
 
-<p><a href="{% url 'target_info' target.name %}">View target details</a></p><br>
-
-<button id="popover" type="button" class="btn btn-default">
+<br><button id="popover" type="button" class="btn btn-default">
   Select Columns
 </button><br><br>
 
@@ -126,6 +128,8 @@ $('#popover')
 });
 </script>
 
+<br><h2 id="visualisation" style="display: inline;">Visualise models</h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">Back to top</a>
+
 <table name="layout_table"><tr><td class="jsmol">
 <script>
 //jsmol scripts will go here
@@ -220,5 +224,228 @@ border-spacing:15px 10px;
 }
 </style>
 
-<p><a href="{% url 'search' %}">Back to search</a></p>
+<script>
+var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+</script>
+
+<br><h2 id="graphs" style="display: inline;">Method comparison</h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">Back to top</a><br><br>
+
+{% if at_least_one %}
+
+<div id="capri_comparison" style="width:100%; height:600px;"></div>
+
+<script>
+var acceptable_by_method_500 = [{% for a in acceptable_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var acceptable_by_method_100 = [{% for b in acceptable_by_method_100 %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var acceptable_by_method_10 = [{% for c in acceptable_by_method_10 %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var medium_by_method_500 = [{% for a in medium_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var medium_by_method_100 = [{% for b in medium_by_method_100 %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var medium_by_method_10 = [{% for c in medium_by_method_10 %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var high_by_method_500 = [{% for a in high_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var high_by_method_100 = [{% for b in high_by_method_100 %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var high_by_method_10 = [{% for c in high_by_method_10 %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+
+for (var i=0;i<acceptable_by_method_500.length;i++) {
+acceptable_by_method_500[i] = parseFloat(acceptable_by_method_500[i])
+acceptable_by_method_100[i] = parseFloat(acceptable_by_method_100[i])
+acceptable_by_method_10[i] = parseFloat(acceptable_by_method_10[i])
+medium_by_method_500[i] = parseFloat(medium_by_method_500[i])
+medium_by_method_100[i] = parseFloat(medium_by_method_100[i])
+medium_by_method_10[i] = parseFloat(medium_by_method_10[i])
+high_by_method_500[i] = parseFloat(high_by_method_500[i])
+high_by_method_100[i] = parseFloat(high_by_method_100[i])
+high_by_method_10[i] = parseFloat(high_by_method_10[i])
+}
+
+//remove cluspro columns to prevent graph begin misleading
+var methods_minus_cluspro = []
+var methods_only_cluspro = []
+var acceptable_minus_cluspro_500 = [];
+var acceptable_minus_cluspro_100 = [];
+var acceptable_minus_cluspro_10 = [];
+var medium_minus_cluspro_500 = [];
+var medium_minus_cluspro_100 = [];
+var medium_minus_cluspro_10 = [];
+var high_minus_cluspro_500 = [];
+var high_minus_cluspro_100 = [];
+var high_minus_cluspro_10 = [];
+var acceptable_or_better_only_cluspro = [];
+
+for (var i=0;i<methods.length;i++) {
+if (methods[i].slice(0,7) != 'ClusPro') {
+	methods_minus_cluspro.push(methods[i]);
+	acceptable_minus_cluspro_500.push(acceptable_by_method_500[i]);
+	acceptable_minus_cluspro_100.push(acceptable_by_method_100[i]);
+	acceptable_minus_cluspro_10.push(acceptable_by_method_10[i]);
+	medium_minus_cluspro_500.push(medium_by_method_500[i]);
+	medium_minus_cluspro_100.push(medium_by_method_100[i]);
+	medium_minus_cluspro_10.push(medium_by_method_10[i]);
+	high_minus_cluspro_500.push(high_by_method_500[i]);
+	high_minus_cluspro_100.push(high_by_method_100[i]);
+	high_minus_cluspro_10.push(high_by_method_10[i]);
+} else {
+	methods_only_cluspro.push(methods[i]);
+	acceptable_or_better_only_cluspro.push(acceptable_by_method_500[i]+medium_by_method_500[i]+high_by_method_500[i]);
+}}
+
+$(function () {
+	$('#capri_comparison').highcharts({
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: 'Number of acceptable, medium and high quality models produced by each docking method for {{ target.name }}, a {{ target_difficulty }} target'
+	},
+	legend : {
+		enabled: true
+	},
+	xAxis: {
+		title: {
+			text: 'Docking method'
+		}
+	},
+	yAxis: {
+		min: 0,
+		title: {
+			text: 'Number of acceptable or better models produced in the top x models'
+		}
+	},
+	xAxis: {
+		categories: methods_minus_cluspro
+	},
+	plotOptions: {
+        	series: {
+            		stacking: 'normal'
+        	}
+    	},
+	series: [{
+		id: 'acc_500',
+		name: 'Acceptable models',
+		data: acceptable_minus_cluspro_500,
+		stack: 'top_500',
+		color: '#990000'
+	}, {
+		id: 'acc_100',
+		name: 'Acceptable models',
+		data: acceptable_minus_cluspro_100,
+		stack: 'top_100',
+		color: '#990000',
+		linkedTo: 'acc_500'
+	}, {
+		id: 'acc_10',
+		name: 'Acceptable models',
+		data: acceptable_minus_cluspro_10,
+		stack: 'top_10',
+		color: '#990000',
+		linkedTo: 'acc_500'
+	}, {
+		id: 'med_500',
+		name: 'Medium models',
+		data: medium_minus_cluspro_500,
+		stack: 'top_500',
+		color: '#009900'
+	}, {
+		id: 'med_100',
+		name: 'Medium models',
+		data: medium_minus_cluspro_100,
+		stack: 'top_100',
+		color: '#009900',
+		linkedTo: 'med_500'
+	}, {
+		id: 'med_10',
+		name: 'Medium models',
+		data: medium_minus_cluspro_10,
+		stack: 'top_10',
+		color: '#009900',
+		linkedTo: 'med_500'
+	}, {
+		id: 'hig_500',
+		name: 'High models',
+		data: high_minus_cluspro_500,
+		stack: 'top_500',
+		color: '#000099'
+	}, {
+		id: 'hig_100',
+		name: 'High models',
+		data: high_minus_cluspro_100,
+		stack: 'top_100',
+		color: '#000099',
+		linkedTo: 'hig_500'
+	}, {
+		id: 'hig_10',
+		name: 'High models',
+		data: high_minus_cluspro_10,
+		stack: 'top_10',
+		color: '#000099',
+		linkedTo: 'hig_500'
+	}]
+	});
+});
+</script>
+
+<br><br><div id="cluspro_table"></div><br>
+
+<script>
+//construct cluspro table
+var cluspro_table_rows = "<table class=\"table\"><tr><th colspan=2>ClusPro also produced the following number of acceptable models using its method of producing 1000 models, clustering and outputting 25 structures.</th></tr>";
+for (var i=0;i<methods_only_cluspro.length;i++) {
+	cluspro_table_rows += "<tr><td>"+methods_only_cluspro[i]+"</td><td>"+acceptable_or_better_only_cluspro[i]+"</td></tr>";
+};
+cluspro_table_rows += "</table>";
+document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
+</script>
+
+{% else %}
+
+<big>There were no acceptable models produced for this target. Choose another target to see how well the methods are able to choose acceptable models.</big><br><br>
+
+{% endif %}
+
+<br><div id="method_comparison" style="width:100%; height:600px;"></div>
+
+<script>
+//Method comparison graph
+var irmsd_by_method = [{% for a in irmsd_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var average_irmsds = [{% for b in average_irmsds %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+for (var i=0;i<irmsd_by_method.length;i++) {
+irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
+average_irmsds[i] = parseFloat(average_irmsds[i])
+}
+
+$(function () {
+	$('#method_comparison').highcharts({
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: 'I-RMSD of best valid model produced by each docking method for {{ target.name }}, a {{ target_difficulty }} target'
+	},
+	legend : {
+		enabled: false
+	},
+	xAxis: {
+		title: {
+			text: 'Docking method'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'I-RMSD of best model produced for {{ target.name }} / \u212B;'
+		}
+	},
+	xAxis: {
+		categories: methods
+	},
+	series: [{
+		name: 'I-RMSD of best model',
+		data: irmsd_by_method
+	}]
+	});
+});
+</script>
+
+<br><a href="#">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="{% url 'search' %}">Back to search</a>
 {% endblock %}

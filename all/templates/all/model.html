@@ -44,7 +44,7 @@
 </tr><tr>
 
 <td><span class="dasa">DASA</span></td>
-<td><span class="dasa">{{ model.dasa }}</span></td>
+<td><span class="dasa">{{ dasa }}</span></td>
 </tr><tr>
 
 <td>ZRANK score</td>
@@ -107,7 +107,7 @@ Jmol.script(jmolApplet0,"select { "+ref_int_10A_residues+" or "+inp_int_10A_resi
 if (int_res_visualisation=="ball_and_stick") {
 Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; wireframe 0.15; spacefill 20%; color wireframe cpk; color balls cpk;");
 } else if (int_res_visualisation=="space_fill") {
-Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; spacefill on; select { {{ model_rec_chains }} }; color balls "+rec_colours[1]+"; select { {{ model_lig_chains }} }; color balls "+lig_colours[1]+"; select all; color balls TRANSLUCENT 0.7");
+Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; spacefill on; select { {{ model_rec_chains }} }; color balls "+rec_colours[1]+"; select { {{ model_lig_chains }} }; color balls "+lig_colours[1]+"; select all; color balls TRANSLUCENT 0.7;");
 }}
 </script><br></td>
 

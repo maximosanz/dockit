@@ -73,7 +73,7 @@ var inp_int_10A_residues = "{{ inp_int_10A_residues }}";
 //initial commands to set up
 //main difference to target page is that the model is one pdb file
 var file_names = ["{% static file_names.rb %}","{% static file_names.lb %}","{% static file_names.model %}"];
-var input = "background white; load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\"; CARTOON only; frame ALL;";
+var input = "background white; load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\"; wireframe only; frame ALL;";
 input += "select */1; color translucent 0.7 "+rec_colours[0]+";";
 input += "select */2; color translucent 0.7 "+lig_colours[0]+";";
 input += "select {"+"{{ model_rec_chains }}"+"}; color translucent 0.7 "+rec_colours[1]+";";
@@ -87,7 +87,12 @@ Jmol.script(jmolApplet0,input);
 
 //re-renders image depending on choices
 function re_render() {
-Jmol.script(jmolApplet0,"select all; color TRANSLUCENT 0.7; color {"+ref_int_10A_residues+"} OPAQUE; cartoon only; hide all;");
+Jmol.script(jmolApplet0,"select all; color TRANSLUCENT 0.7; color {"+ref_int_10A_residues+" or "+inp_int_10A_residues+"} OPAQUE;");
+if (complex_visualisation == "wireframe") {
+	Jmol.script(jmolApplet0,"wireframe only; hide all;")
+} else {
+	Jmol.script(jmolApplet0,"cartoon only; hide all;")
+}
 //make models visible as required
 for (var i=1;i<=4;i++) {
 if (vis_array[i-1]==true) {
@@ -106,13 +111,19 @@ Jmol.script(jmolApplet0,"select { "+ref_int_10A_residues+" or "+inp_int_10A_resi
 }
 //change how 5A interface residues are viewed
 if (int_res_visualisation=="ball_and_stick") {
-Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; wireframe 0.15; spacefill 20%; color wireframe cpk; color balls cpk;");
+Jmol.script(jmolApplet0,"select { {{ inp_int_5A_residues }} }; wireframe 0.15; spacefill 20%; color wireframe cpk; color balls cpk;");
 } else if (int_res_visualisation=="space_fill") {
-Jmol.script(jmolApplet0,"select {"+"{{ inp_int_5A_residues }}"+"}; spacefill on; select { {{ model_rec_chains }} }; color balls "+rec_colours[1]+"; select { {{ model_lig_chains }} }; color balls "+lig_colours[1]+"; select all; color balls TRANSLUCENT 0.7;");
+Jmol.script(jmolApplet0,"select { {{ inp_int_5A_residues }} }; spacefill on; select { {{ model_rec_chains }} }; color balls "+rec_colours[1]+"; select { {{ model_lig_chains }} }; color balls "+lig_colours[1]+"; select all; color balls TRANSLUCENT 0.7;");
+} else {
+var input = "select { {{ inp_int_5A_residues }} }; select selected and { {{ model_rec_chains }} }; color wireframe "+rec_colours[1]+";";
+input += "select { {{ inp_int_5A_residues }} }; select selected and { {{ model_lig_chains }} }; color wireframe "+lig_colours[1]+";";
+Jmol.script(jmolApplet0,input);
 }}
 </script><br></td>
 
 <td style="padding-left: 10px;line-height: 1.5;">
+<a onClick='toggle_complex_vis()' style="cursor: pointer">Toggle wireframe/cartoon representation</a>
+<br><br>
 Receptor chains in native structure:<br>
 <script>
 document.write("{{ model.target.receptor_bound_chain }} - "+rec_colours[0]);
@@ -148,13 +159,13 @@ Change how much of the complex is visible:<br>
 
 <form name="int_res_changer" onSubmit="return false">
 Change how the model 5 &#8491; interface residues are viewed:<br>
-<input type="radio" name="int_res_select" onClick='change_int_res("cartoon")' checked>&nbsp;View as cartoon<br>
+<input type="radio" name="int_res_select" onClick='change_int_res("cartoon")' checked>&nbsp;View as wireframe/cartoon<br>
 <input type="radio" name="int_res_select" onClick='change_int_res("ball_and_stick")'>&nbsp;View as ball and stick<br>
 <input type="radio" name="int_res_select" onClick='change_int_res("space_fill")'>&nbsp;View as space-filling spheres<br>
 </form></td></tr></table>
 
 <form name="term_form" onSubmit="return false">
-JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300px" />
+JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300px" placeholder="e.g. 'select ARG; color black'" />
 <button onClick=update_Jmol(document.term_form.terminal.value)>Update</button>
 <button onClick=reset_Jmol();>Reset</button></form>
 

@@ -166,7 +166,12 @@ if (models_selected.length > 10) {
 	for (var i=0; i<models_selected.length; i++) {
 		load_files += " \""+models_selected[i]+"\"";
 	}
-	load_files += "; CARTOON only; frame ALL; {{ hide_rec_chains }}; display displayed or (model=1.1); color (model=1.1) red; color (model=2.1) blue;";
+	if (complex_visualisation == "wireframe") {
+		load_files += "; wireframe only;";
+	} else {
+		load_files += "; cartoon only;";
+	}
+	load_files += "; frame ALL; {{ hide_rec_chains }}; display displayed or (model=1.1); color (model=1.1) red; color (model=2.1) blue;";
 
 	for (var i=0; i<models_selected.length; i++) {
 		load_files += " color (model="+(i+3)+".1) translucent 0.4 "+colour_array[i]+";";
@@ -182,6 +187,8 @@ if (models_selected.length > 10) {
 <tr><td style="background-color:blue; width:60px"><center><font color="white"><b>Blue</b></font></center></td>
 <td>Native ligand</td></tr>
 <tr><td colspan="2">The model ligands are coloured as shown in the table above</td></tr></table>
+
+&nbsp;&nbsp;<a onClick='toggle_complex_vis()' style="cursor: pointer">Toggle wireframe/cartoon representation</a>
 
 </td></tr></table>
 

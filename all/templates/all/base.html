@@ -4,6 +4,7 @@
 {% endblock %}
 </title>
 {% load static from staticfiles %}
+{% django_js jquery=false %}
 
 <!--jquery, used by bootstrap, highcharts, jsmol, tablesorter and opentip-->
 <script src="{% static "jquery-1-8-2.min.js" %}"></script>
@@ -53,9 +54,7 @@
 <script>
 function goTo(name) {
 	if (name != "-") {
-	//needs changing to reverse url search
-	document.location.href="http://msc.bc.ic.ac.uk:8008/target/"+name;
-	//Django.url('target_info',name);
+		window.location.href = Django.url('target_info',{'name':name});
 	}
 }
 

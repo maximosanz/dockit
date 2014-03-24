@@ -16,7 +16,7 @@
 
 <form name="target_select">
 <tr><td>Select from all targets:</td>
-<td><select name="target_choice_all" onChange=goTo(document.target_select.target_choice_all.options[document.target_select.target_choice_all.selectedIndex].value) style="width: 80px">
+<td><select name="target_choice_all" onChange="goTo(document.target_select.target_choice_all.options[document.target_select.target_choice_all.selectedIndex].value)" style="width: 80px">
 <option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 {% for complex in Target %}
 	<option value={{ complex.name }}>{{ complex.name }}</option>
@@ -47,7 +47,7 @@
 <h2><span class="model_search">Model search</span></h2>
 
 <form method='POST'>{% csrf_token %}
-<table class="table">{{ form.as_table }}</table>
+<table id='model_search_table' class="table">{{ form.as_table }}</table>
 
 <input type="submit" value="Submit" /></form>
 <script>

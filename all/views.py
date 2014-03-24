@@ -22,12 +22,16 @@ def target(request):
 def target_info(request, name):
 	#details on a particular target
 	target = Target.objects.get(name=name)
+	#category of target
+	cat_dict={'E':'Enzyme/Inhibitor or Enzyme/substrate','A':'Antibody/Antigen','O':'Others','AB':'Antigen/Bound antibody'}
+	target_dict=target.__dict__
+	complete_cat=cat_dict[target_dict['category']]
 	#need to change from absolute filepath
 	interactions = extract_interactions('/project/data/dockit/static/bench_contacts/'+target.name+'_caprifit-contacts.out',False)
 	#interactions = extract_interactions(static('bench_contacts/'+target.name+'_caprifit-contacts.out'),False)
 	file_names = {'rb':'benchmarks/'+target.name+'_r_b.pdb','lb':'benchmarks/'+target.name+'_l_b.pdb','ru':'benchmarks/'+target.name+'_r_u_cleanedup.pdb','lu':'benchmarks/'+target.name+'_l_u_cleanedup.pdb'}
 	#unbound interface residues and contacts inputted as empty to avoid drawing them (may change this)
-        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId="}
+        context = {'target':target,'file_names':file_names,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=", 'complete_cat':complete_cat}
         return insert_form_and_go(request, 'all/target_info.html', context)
 
 def search(request):
@@ -122,13 +126,16 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 		context = {'results':results, 'count':count}
 		return HttpResponseRedirect(reverse('refine_search',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_t':i_rmsd_threshold, 'l_rmsd_t':l_rmsd_threshold, 'r_rmsd_t':r_rmsd_threshold, 'fnat_t':fnat_threshold, 'rank_str':rank_str,'count':count}))
 	else:
-		results=results.values('id','number','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','target__complex','target__ligand','target__receptor','capri_ev','capri_valid','no_clashes','asa_c','asa_rl')
+		results=results.values('id','number','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','target__complex','target__ligand','target__receptor','capri_ev','capri_valid','no_clashes','asa_c','asa_rl','score__scoring_function__name','score__score')
 		if not results:
 			return insert_form_and_go(request, 'all/noresults.html', {})
 		else:
-			context = {'results':results}
+			final_results=[]
 			capri_ranks=['Incorrect','Acceptable','Medium','High']
-			for model in results:
+			j=0
+			for i in range(count):
+				final_results.append(results[i+j])
+				model=final_results[i]
 				model['method__name_lower']=model['method__name'].lower()
 				model['refinement__name_lower']=model['refinement__name'].lower()
 				model['target__difficulty_lower']=model['target__difficulty'].lower()
@@ -137,10 +144,27 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 					model['capri_rank']='Removed'
 				else:
 					model['capri_rank']=capri_ranks[model['capri_ev']]
+				for sc_f in ScoringFunction.objects.all().values('name'):
+					final_results[i][sc_f['name'].lower()+'_score']='Not scored'
+				sc_f=model['score__scoring_function__name']
+				cur_id=final_results[i]['id']
+				cur_i=i
+				if sc_f != None:
+					while i+j<len(results) and results[i+j]['id']==cur_id:
+						sc_f=results[i+j]['score__scoring_function__name']
+						if results[i+j]['score__score'] == None:
+							final_results[cur_i][sc_f.lower()+'_score']='Unable to score model'
+						else:
+							final_results[cur_i][sc_f.lower()+'_score']=results[i+j]['score__score']
+						if i != cur_i:
+							j+=1					
+						i+=1
+			context = {'results':final_results}				
 			if target not in ['All', 'Rigid', 'Medium', 'Difficult']:
 				return HttpResponseRedirect(reverse('target_models',kwargs={'name':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str}))
 			else:
 				return insert_form_and_go(request, 'all/model_select.html', context)
+
 
 def scoring(request, scorer, target, cutoff):
 	#comparison of scoring functions

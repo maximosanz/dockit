@@ -2,6 +2,7 @@ from django import forms
 from all.models import Target
 from all.models import Method
 from all.models import Refinement
+import re
 
 class model_select_form(forms.Form):
         target_options = [['All', 'All targets'],['Rigid', 'All rigid targets']]

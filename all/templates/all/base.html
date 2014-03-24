@@ -3,6 +3,7 @@
 {% block title %}
 {% endblock %}
 </title>
+{% django_js jquery=false %}
 {% load static from staticfiles %}
 
 <!--jquery, used by bootstrap, highcharts, jsmol, tablesorter and opentip-->
@@ -51,11 +52,9 @@
 <script>
 function goTo(name) {
 	if (name != "-") {
-	//needs changing to reverse url search
-	document.location.href="http://msc.bc.ic.ac.uk:8008/target/"+name;
-	//Django.url('target_info',name);
-	}
-}
+	window.location.href = Django.url('target_info', {'name':name});
+	};
+};
 
 //info for JSMol window
 var info = {
@@ -73,7 +72,6 @@ padding-top: 60px;
 padding-bottom: 40px;
 }
 </style>
-
 </head>
 <body class="container">
 

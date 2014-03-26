@@ -16,4 +16,5 @@ urlpatterns = patterns('',
     url(r'^about/$', views.about, name='about'),
     url(r'^noresults/$', views.noresults, name='noresults'),
     url(r'^refine_search_(?P<target>[\S|^\_]+)_(?P<method>[\S|^\_]+)_(?P<refinement>[\S|^\_]+)_(?P<i_rmsd_t>[\S|^\_]+)_(?P<l_rmsd_t>[\S|^\_]+)_(?P<r_rmsd_t>[\S|^\_]+)_(?P<fnat_t>[\S|^\_]+)_(?P<rank_str>[\S|^\_]+)_(?P<count>\w+)/$', views.refine_search, name='refine_search'),
+    url(r'^top_models_(?P<target>[\S|^\_]+)_(?P<n>[\S|^\_]+)_(?P<criteria>[\S|^\_]+)/$', views.top_models, name='top_models'),
 )

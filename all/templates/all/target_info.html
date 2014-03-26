@@ -7,8 +7,24 @@
 <h1>{{ target.name }} target details <small><a href="{% url 'model_select' target.name 'All' 'All' 0 0 0 0 1 0 %}" class="view_models">View models</a></small></h1>
 </div>
 
+<a href="{% url 'model_select' target.name 'All' 'All' 0 0 0 0 '01110' 0 %}">View all acceptable or better models for {{ target.name }}</a><br><br>
+
+Select top <select id="n_top_models">
+<option value='1'>1</option>
+<option value='10'>10</option>
+<option value='100'>100</option>
+<option value='500'>500</option></select> models for {{ target.name }} according to <select id="criteria_top_models">
+<option value='i-rmsd'>I-RMSD</option>
+<option value='l-rmsd'>L-RMSD</option>
+<option value='fnat'>Fnat</option>
+</select>&nbsp;&nbsp;
+<button type="submit" id="view_top_models">View</button>
+<br><br>
+
+
+<form method="get" action="{% static "csv/"|add:target.name|add:"_models.csv" %}"><button type="submit">Download data for {{ target.name }} models</button>&nbsp;&nbsp;Download the complete table with all models for {{ target.name }} as a CSV file<br><br>
 <table class="table"><tr>
-<td colspan="2"><a href="{{ pdb_url }}{{ target.name }}" target="_blank" class="pdb_page">View PDB entry</a></td>
+<tr><td colspan="2"><a href="{{ pdb_url }}{{ target.name }}" target="_blank" class="pdb_page">View PDB entry</a></td>
 </tr><tr>
 <td><span class="difficulty">Difficulty</span></td>
 <td><span class="difficulty">{{ target.difficulty }}</span></td>
@@ -31,12 +47,19 @@
 <td><span class="i_rmsd">I-RMSD</span></td>
 <td><span class="i_rmsd">{{ target.i_rmsd }}</span></td>
 </tr><tr>
-<td><span class="dasa">DASA</span></td>
+<td><span class="dasa">&#916;ASA</span></td>
 <td><span class="dasa">{{ dasa }}</span></td>
 </tr></table>
 
 <table name="layout_table"><tr><td class="jsmol">
 <script>
+//view top models
+$('#view_top_models').click(function(){
+	var n = $('#n_top_models option:selected').val();
+	var criteria = $('#criteria_top_models option:selected').val();
+	window.location.href = Django.url('top_models',{'target':'{{ target.name }}','n':n,'criteria':criteria});
+});
+
 //visibility of native_rec, native_lig , unbound_rec, unbound_lig
 var vis_array = [true,true,false,false];
 

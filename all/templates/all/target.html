@@ -23,7 +23,7 @@
 <th><div class="rec_description">Receptor description</div></th>
 <th><div class="lig_description">Ligand description</div></th>
 <th><div class="i_rmsd_target">I-RMSD</div></th>
-<th><div class="dasa">DASA</div></th>
+<th><div class="dasa">&#916;ASA</div></th>
 <th></th>
 <th></th>
 </tr>
@@ -35,7 +35,7 @@
 	<td style="width: 150px"><div class="lig_pdb_id"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></div></td>	
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
-	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
+	<td ><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
 	<td><div class="dasa" id="{{ complex.name }}_dasa"></div></td>
 	<td class="view_info" style="width: 100px"><a href="{% url 'target_info' complex.name %}">View info</a></td>
 	<td class="view_models" style="width: 100px"><a href="{% url 'model_select' complex.name 'All' 'All' 0 0 0 0 1 0 %}">View models</a></td>

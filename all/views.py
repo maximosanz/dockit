@@ -179,7 +179,7 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 				else:
 					model['capri_rank']=capri_ranks[model['capri_ev']]
 				for sc_f in ScoringFunction.objects.all().values('name'):
-					final_results[i][sc_f['name'].lower()+'_score']='Not scored'
+					final_results[i][sc_f['name'].lower()+'_score']='-'
 				sc_f=model['score__scoring_function__name']
 				cur_id=final_results[i]['id']
 				cur_i=i
@@ -187,7 +187,7 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 					while i+j<len(results) and results[i+j]['id']==cur_id:
 						sc_f=results[i+j]['score__scoring_function__name']
 						if results[i+j]['score__score'] == None:
-							final_results[cur_i][sc_f.lower()+'_score']='Unable to score model'
+							final_results[cur_i][sc_f.lower()+'_score']='Unable to score'
 						else:
 							final_results[cur_i][sc_f.lower()+'_score']=results[i+j]['score__score']
 						if i != cur_i:
@@ -249,8 +249,9 @@ def model(request, id):
 	zrank_score = get_score('ZRANK')
 	zrank2_score = get_score('ZRANK2')
 	pisa_score = get_score('PISA')
+	spider_score = get_score('SPIDER')
 
-        context = {'model':model,'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=",'dasa':dasa,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score}
+        context = {'model':model,'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=",'dasa':dasa,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score,'spider_score':spider_score}
         return insert_form_and_go(request, 'all/model.html', context)
 
 def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str):
@@ -309,7 +310,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 			else:
 				model['capri_rank']=capri_ranks[model['capri_ev']]
 			for sc_f in ScoringFunction.objects.all().values('name'):
-				final_results[i][sc_f['name'].lower()+'_score']='Not scored'
+				final_results[i][sc_f['name'].lower()+'_score']='-'
 			sc_f=model['score__scoring_function__name']
 			cur_id=final_results[i]['id']
 			cur_i=i
@@ -317,7 +318,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 				while i+j<len(results) and results[i+j]['id']==cur_id:
 					sc_f=results[i+j]['score__scoring_function__name']
 					if results[i+j]['score__score'] == None:
-						final_results[cur_i][sc_f.lower()+'_score']='Unable to score model'
+						final_results[cur_i][sc_f.lower()+'_score']='Unable to score'
 					else:
 						final_results[cur_i][sc_f.lower()+'_score']=results[i+j]['score__score']
 					if i != cur_i:
@@ -511,6 +512,33 @@ def refine_search(request, target, method, refinement, i_rmsd_t, l_rmsd_t, r_rms
 			return HttpResponseRedirect(reverse('model_select',kwargs={'target':target,'method':method,'refinement':refinement, 'i_rmsd_threshold':i_rmsd_threshold, 'l_rmsd_threshold':l_rmsd_threshold, 'r_rmsd_threshold':r_rmsd_threshold, 'fnat_threshold':fnat_threshold, 'rank_str':rank_str, 'bypass':'0'}))
 
 
+def top_models(request,target,n,criteria):
+	criteria = re.sub('-','_', criteria)
+	n=int(n)
+	results = Model.objects.filter(target__name=target)
+	if criteria != 'fnat':
+		results = results.order_by(criteria).values('id',criteria)
+	else:
+		results = results.order_by('-fnat').values('id',criteria)
+	criteria_arg = criteria+"_threshold"
+	if n!=1:
+		cutoff = str(results[n-1][criteria])
+		cutoff = re.sub('\.', '-', cutoff)
+		target_models_possible_arguments={'name':target, 'method':'All', 'refinement':'All', 'i_rmsd_threshold':0, 'l_rmsd_threshold':0, 'r_rmsd_threshold':0, 'fnat_threshold':0, 'rank_str':1}
+		target_models_arguments={}
+		for arg in target_models_possible_arguments:
+			if arg!=criteria_arg:
+				target_models_arguments[arg]=target_models_possible_arguments[arg]
+			else:
+				if arg=='fnat_threshold' and cutoff=="0-0":
+					target_models_arguments[arg]="0-001"
+				else:
+					target_models_arguments[arg]=cutoff
+
+		return HttpResponseRedirect(reverse('target_models',kwargs=target_models_arguments))
+
+	else:
+		return HttpResponseRedirect(reverse('model',kwargs={'id':results[0]['id']}))
 
 
 def insert_form_and_go(request,template,context):

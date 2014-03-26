@@ -33,10 +33,10 @@
 <th data-priority="5" class="columnSelector-false th.dasa" data-placeholder="e.g. '<5000'">&#916;ASA</th>
 <th data-priority="5" class="columnSelector-false th.no_clashes" data-placeholder="e.g. '<60'">No. of clashes</th>
 <th data-priority="5" class="columnSelector-false th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
-<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">ZRANK Score</th>
-<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">ZRANK2 Score</th>
-<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">PISA Score</th>
-<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">SPIDER Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '/\d/'">ZRANK Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '/\d/'">ZRANK2 Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '/\d/'">PISA Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '/\d/'">SPIDER Score</th>
 </tr>
 </thead>
 <tbody>
@@ -331,6 +331,12 @@ $(function () {
 		min: 0,
 		title: {
 			text: 'Number of acceptable or better models produced in the top x models'
+		},
+		stackLabels: {
+		    align: 'center',
+                    enabled: true,
+		    verticalAlign: 'top',
+		    format: "{stack}",
 		}
 	},
 	xAxis: {
@@ -345,60 +351,60 @@ $(function () {
 		id: 'acc_500',
 		name: 'Acceptable models',
 		data: acceptable_minus_cluspro_500,
-		stack: 'top_500',
-		color: '#990000'
+		stack: 'Top 500',
+		color: '#990000',
 	}, {
 		id: 'acc_100',
 		name: 'Acceptable models',
 		data: acceptable_minus_cluspro_100,
-		stack: 'top_100',
+		stack: 'Top 100',
 		color: '#990000',
-		linkedTo: 'acc_500'
+		linkedTo: 'acc_500',
 	}, {
 		id: 'acc_10',
 		name: 'Acceptable models',
 		data: acceptable_minus_cluspro_10,
-		stack: 'top_10',
+		stack: 'Top 10',
 		color: '#990000',
-		linkedTo: 'acc_500'
+		linkedTo: 'acc_500',
 	}, {
 		id: 'med_500',
 		name: 'Medium models',
 		data: medium_minus_cluspro_500,
-		stack: 'top_500',
+		stack: 'Top 500',
 		color: '#009900'
 	}, {
 		id: 'med_100',
 		name: 'Medium models',
 		data: medium_minus_cluspro_100,
-		stack: 'top_100',
+		stack: 'Top 100',
 		color: '#009900',
 		linkedTo: 'med_500'
 	}, {
 		id: 'med_10',
 		name: 'Medium models',
 		data: medium_minus_cluspro_10,
-		stack: 'top_10',
+		stack: 'Top 10',
 		color: '#009900',
 		linkedTo: 'med_500'
 	}, {
 		id: 'hig_500',
 		name: 'High models',
 		data: high_minus_cluspro_500,
-		stack: 'top_500',
+		stack: 'Top 500',
 		color: '#000099'
 	}, {
 		id: 'hig_100',
 		name: 'High models',
 		data: high_minus_cluspro_100,
-		stack: 'top_100',
+		stack: 'Top 100',
 		color: '#000099',
 		linkedTo: 'hig_500'
 	}, {
 		id: 'hig_10',
 		name: 'High models',
 		data: high_minus_cluspro_10,
-		stack: 'top_10',
+		stack: 'Top 10',
 		color: '#000099',
 		linkedTo: 'hig_500'
 	}]

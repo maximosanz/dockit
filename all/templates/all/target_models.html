@@ -471,10 +471,14 @@ document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
 //Method comparison graph
 var irmsd_by_method = [{% for a in irmsd_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 var average_irmsds = [{% for b in average_irmsds %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var best_models = [{% for c in best_irmsd_model_by_method %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+var data_series = []
 
 for (var i=0;i<irmsd_by_method.length;i++) {
-irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
+//irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
 average_irmsds[i] = parseFloat(average_irmsds[i])
+data_series.push({'y':parseFloat(irmsd_by_method[i]),'best_model':best_models[i]})
 }
 
 $(function () {
@@ -501,9 +505,21 @@ $(function () {
 	xAxis: {
 		categories: methods
 	},
+	plotOptions: {
+		series: {
+			cursor: 'pointer',
+			point : {
+				events: {
+					click : function(){
+						location.href = "/model_"+this.options.best_model;
+					}
+				}
+			}
+		}
+	},
 	series: [{
 		name: 'I-RMSD of best model',
-		data: irmsd_by_method,
+		data: data_series,
 	}]
 	});
 });

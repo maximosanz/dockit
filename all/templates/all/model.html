@@ -9,7 +9,7 @@
 
 <table class="table"><tr>
 
-<td colspan="2"><a href="{% url 'target_models' model.target.name 'All' 'All' 0 0 0 0 1 %}" class="view_models">View other models for {{ model.target.name }}</a></td>
+<td colspan="2"><a href="{% url 'model_select' model.target.name 'All' 'All' 0 0 0 0 1 0 %}" class="view_models">View other models for {{ model.target.name }}</a></td>
 </tr><tr>
 
 <td><span class="pdb_id">Target</span></td>
@@ -58,6 +58,10 @@
 
 <td>PISA score</td>
 <td>{{ pisa_score }}</td>
+</tr><tr>
+
+<td>SPIDER score</td>
+<td>{{ spider_score }}</td>
 </tr></table>
 
 <table name="layout_table"><tr><td class="jsmol">

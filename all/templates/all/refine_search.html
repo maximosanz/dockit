@@ -17,24 +17,39 @@ Displaying more than 1000 results will significantly affect the page's performan
 <div style='display:none;' id="target_search_refine">
 <p><big><b>{{ count }}</b> models were found for target {{ target }}<br>
 Displaying more than 1000 results will significantly affect the page's performance</big></p>
-<br>
 <table class="toptable">
 <tr><td><input type="submit" value="Proceed Regardless" /></td><td>Note that the page may take several minutes to load</td></tr>
 <tr><td><form method="get" action="{% static "csv/"|add:target|add:"_models.csv" %}"><button type="submit">Download data for {{ target }} models</button></form></td><td>Download the complete table with all models for {{ target }} as a CSV file</td></tr>
 <tr><td><form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button></form></td><td>Download the complete table with all models as a CSV file</td></tr>
-</table>
+</table><br>
+
+Select top <select id="n_top_models">
+<option value='1'>1</option>
+<option value='10'>10</option>
+<option value='100'>100</option>
+<option value='500'>500</option></select> models for {{ target }} according to <select id="criteria_top_models">
+<option value='i-rmsd'>I-RMSD</option>
+<option value='l-rmsd'>L-RMSD</option>
+<option value='fnat'>Fnat</option>
+</select>&nbsp;&nbsp;
+<button type="submit" id="view_top_models">View</button>
+<br><br>
+<a href="{% url 'model_select' target 'All' 'All' 0 0 0 0 '01110' 0 %}">View all acceptable or better models for {{ target }}</a><br>
 </div>
-
-
-
-
-
 
 <h2>Refine search</h2><form method='POST'>{% csrf_token %}
 <table id='refine_search_table' class="table">{{ initiated_form.as_table }}</table>
 <input type="submit" value="Submit" /></form>
 
 <script>
+//view top models
+$('#view_top_models').click(function(){
+	var n = $('#n_top_models option:selected').val();
+	var criteria = $('#criteria_top_models option:selected').val();
+	window.location.href = Django.url('top_models',{'target':'{{ target }}','n':n,'criteria':criteria});
+});
+
+
 $('#refine_search_table [value="All_ranks"]').click(function(){
 	if(this.checked){
 		$('#refine_search_table [name="capri_rank"]').not('[value="All_ranks"]').attr('disabled','disabled');

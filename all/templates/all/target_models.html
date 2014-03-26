@@ -2,7 +2,7 @@
 {% block content %}
 {% django_js jquery=false %}
 {% load static from staticfiles %}
-<div id="everything" style="display: none;">
+<div id="everything" style="width:100%; padding:5%; display: none;">
 <h1>{{ target.name }} models</h1>
 
 <p><a href="{% url 'target_info' target.name %}">View target details</a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -33,6 +33,10 @@
 <th data-priority="5" class="columnSelector-false th.dasa" data-placeholder="e.g. '<5000'">&#916;ASA</th>
 <th data-priority="5" class="columnSelector-false th.no_clashes" data-placeholder="e.g. '<60'">No. of clashes</th>
 <th data-priority="5" class="columnSelector-false th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">ZRANK Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">ZRANK2 Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">PISA Score</th>
+<th data-priority="6" class="columnSelector-false" data-placeholder="e.g. '!Not scored'">SPIDER Score</th>
 </tr>
 </thead>
 <tbody>
@@ -50,6 +54,10 @@
 <td class="td.dasa">{{ model.dasa }}</td>
 <td class="td.no_clashes">{{ model.no_clashes }}</td>
 <td class="td.i_l_rmsd row_id_{{ model.id }}">{{ model.i_l_rmsd }}</td>
+<td class="row_id_{{ model.id }}">{{ model.zrank_score }}</td>
+<td class="row_id_{{ model.id }}">{{ model.zrank2_score }}</td>
+<td class="row_id_{{ model.id }}">{{ model.pisa_score }}</td>
+<td class="row_id_{{ model.id }}">{{ model.spider_score }}</td>
 <td class="td.viewmodel" style='width:95px'><a href="{% url 'model' model.id %}" class="view_model">View model</a></td>
 </tr>
 {% endfor %}
@@ -231,9 +239,9 @@ var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%en
 
 <br><h2 id="graphs" style="display: inline;">Method comparison</h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">Back to top</a><br><br>
 
-{% if at_least_one %}
+{% if at_least_one_no_cluspro %}
 
-<div id="capri_comparison" style="width:100%; height:600px;"></div>
+<div id="capri_comparison" style="width:1200px; height:600px;"></div>
 
 <script>
 var acceptable_by_method_500 = [{% for a in acceptable_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
@@ -271,6 +279,9 @@ var medium_minus_cluspro_10 = [];
 var high_minus_cluspro_500 = [];
 var high_minus_cluspro_100 = [];
 var high_minus_cluspro_10 = [];
+var acceptable_only_cluspro = [];
+var medium_only_cluspro = [];
+var high_only_cluspro = [];
 var acceptable_or_better_only_cluspro = [];
 
 for (var i=0;i<methods.length;i++) {
@@ -288,6 +299,9 @@ if (methods[i].slice(0,7) != 'ClusPro') {
 } else {
 	methods_only_cluspro.push(methods[i]);
 	acceptable_or_better_only_cluspro.push(acceptable_by_method_500[i]+medium_by_method_500[i]+high_by_method_500[i]);
+	acceptable_only_cluspro.push(acceptable_by_method_500[i]);
+	medium_only_cluspro.push(medium_by_method_500[i]);
+	high_only_cluspro.push(high_by_method_500[i]);
 }}
 
 $(function () {
@@ -389,13 +403,56 @@ $(function () {
 
 <script>
 //construct cluspro table
-var cluspro_table_rows = "<table class=\"table\"><tr><th colspan=2>ClusPro also produced the following number of acceptable models using its method of producing 1000 models, clustering and outputting 25 structures.</th></tr>";
+var cluspro_table_rows = "<table class=\"table\"><tr><th colspan=4>ClusPro also produced the following number of acceptable or better models using its method of producing 14000 models, clustering the top 1000 and outputting the cluster centers (final output of 25-30 structures).</th></tr><tr><th>Method</th><th>Acceptable</th><th>Medium</th><th>High</th></tr>";
 for (var i=0;i<methods_only_cluspro.length;i++) {
-	cluspro_table_rows += "<tr><td>"+methods_only_cluspro[i]+"</td><td>"+acceptable_or_better_only_cluspro[i]+"</td></tr>";
+	cluspro_table_rows += "<tr><td>"+methods_only_cluspro[i]+"</td><td>"+acceptable_only_cluspro[i]+"</td><td>"+medium_only_cluspro[i]+"</td><td>"+high_only_cluspro[i]+"</td></tr>";
 };
 cluspro_table_rows += "</table>";
 document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
 </script>
+
+{% elif at_least_one %}
+
+<big>No method other than ClusPro produced acceptable models for this target on their top 500. Choose another target to see how well the methods are able to choose acceptable models.</big><br><br>
+
+<br><br><div id="cluspro_table"></div><br>
+
+<script>
+var acceptable_by_method_500 = [{% for a in acceptable_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var medium_by_method_500 = [{% for a in medium_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var high_by_method_500 = [{% for a in high_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+for (var i=0;i<acceptable_by_method_500.length;i++) {
+acceptable_by_method_500[i] = parseFloat(acceptable_by_method_500[i])
+medium_by_method_500[i] = parseFloat(medium_by_method_500[i])
+high_by_method_500[i] = parseFloat(high_by_method_500[i])
+}
+
+//remove cluspro columns to prevent graph begin misleading
+var methods_only_cluspro = []
+var acceptable_only_cluspro = [];
+var medium_only_cluspro = [];
+var high_only_cluspro = [];
+var acceptable_or_better_only_cluspro = [];
+
+for (var i=0;i<methods.length;i++) {
+if (methods[i].slice(0,7) == 'ClusPro') {
+	methods_only_cluspro.push(methods[i]);
+	acceptable_or_better_only_cluspro.push(acceptable_by_method_500[i]+medium_by_method_500[i]+high_by_method_500[i]);
+	acceptable_only_cluspro.push(acceptable_by_method_500[i]);
+	medium_only_cluspro.push(medium_by_method_500[i]);
+	high_only_cluspro.push(high_by_method_500[i]);
+}}
+
+//construct cluspro table
+var cluspro_table_rows = "<table class=\"table\"><tr><th colspan=4>ClusPro produced the following number of acceptable or better models using its method of producing 14000 models, clustering the top 1000 and outputting the cluster centers (final output of 25-30 structures).</th></tr><tr><th>Method</th><th>Acceptable</th><th>Medium</th><th>High</th></tr>";
+for (var i=0;i<methods_only_cluspro.length;i++) {
+	cluspro_table_rows += "<tr><td>"+methods_only_cluspro[i]+"</td><td>"+acceptable_only_cluspro[i]+"</td><td>"+medium_only_cluspro[i]+"</td><td>"+high_only_cluspro[i]+"</td></tr>";
+};
+cluspro_table_rows += "</table>";
+document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
+</script>
+
 
 {% else %}
 
@@ -403,7 +460,7 @@ document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
 
 {% endif %}
 
-<br><div id="method_comparison" style="width:100%; height:600px;"></div>
+<br><div id="method_comparison" style="width:1200px; height:600px;"></div>
 
 <script>
 //Method comparison graph
@@ -441,7 +498,7 @@ $(function () {
 	},
 	series: [{
 		name: 'I-RMSD of best model',
-		data: irmsd_by_method
+		data: irmsd_by_method,
 	}]
 	});
 });

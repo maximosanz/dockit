@@ -42,7 +42,7 @@ var vis_array = [true,true,false,false];
 
 //initial commands to set up
 var file_names = ["{% static file_names.rb %}","{% static file_names.lb %}","{% static file_names.ru %}","{% static file_names.lu %}"];
-var input = "background white; load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\" \""+file_names[3]+"\"; wireframe only; frame ALL;";
+var input = "load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\" \""+file_names[3]+"\"; wireframe only; frame ALL;";
 input += "select */1; color translucent 0.7 "+rec_colours[0]+";";
 input += "select */2; color translucent 0.7 "+lig_colours[0]+";";
 input += "select */3; color translucent 0.7 "+rec_colours[1]+";";

@@ -12,7 +12,7 @@
 <script>
 //change scoring graph when options are changed
 function change_graph(target,scorer,cutoff) {
-document.location.href="/scoring_"+scorer+"_"+target+"_"+cutoff;
+window.location.href = Django.url('scoring',{'scorer':scorer,'target':target,'cutoff':cutoff});
 }
 
 var model_irmsds = [{% for a in model_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];

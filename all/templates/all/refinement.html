@@ -4,21 +4,15 @@
 {% django_js jquery=false %}
 
 <div class="page-header">
-<h1>Refinement <small>Some text</small></h1>
+<h1>Refinement</h1>
 </div>
 
 <div id="refinement_graph" style="width:100%; height:600px;"></div>
 
-<table>
-<tr><td>Slide to change the maximum value on the x axis:</td>
-<td style="width=200px; height=10px"></div></td></tr>
-</table>
-<div id="slider1" style="width=200px; height=10px"><br><br>
-
 <script>
 //change refinement graph when options are changed
 function change_graph(target,method,refinement,cutoff) {
-document.location.href="/refinement_"+method+"_"+refinement+"_"+target+"_"+cutoff;
+window.location.href = Django.url('refinement',{'method':method,'refinement':refinement,'target':target,'cutoff':cutoff});
 }
 
 var no_ref_irmsds = [{% for a in no_ref_irmsds %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];

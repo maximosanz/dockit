@@ -73,7 +73,7 @@ var inp_int_10A_residues = "{{ inp_int_10A_residues }}";
 //initial commands to set up
 //main difference to target page is that the model is one pdb file
 var file_names = ["{% static file_names.rb %}","{% static file_names.lb %}","{% static file_names.model %}"];
-var input = "background white; load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\"; wireframe only; frame ALL;";
+var input = "load FILES \""+file_names[0]+"\" \""+file_names[1]+"\" \""+file_names[2]+"\"; wireframe only; frame ALL;";
 input += "select */1; color translucent 0.7 "+rec_colours[0]+";";
 input += "select */2; color translucent 0.7 "+lig_colours[0]+";";
 input += "select {"+"{{ model_rec_chains }}"+"}; color translucent 0.7 "+rec_colours[1]+";";

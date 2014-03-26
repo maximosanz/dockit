@@ -18,13 +18,7 @@
 <script src="http://code.highcharts.com/modules/exporting.js"></script>
 
 <!--jsmol-->
-<script src="{% static "jsmol/js/JSmolCore.js" %}"></script>
-<script src="{% static "jsmol/js/JSmol.js" %}"></script>
-<script src="{% static "jsmol/js/JSmolApplet.js" %}"></script>
-<script src="{% static "jsmol/js/JSmolControls.js" %}"></script>
-<script src="{% static "jsmol/js/JSmolApi.js" %}"></script>
-<script src="{% static "jsmol/js/j2sjmol.js" %}"></script>
-<script src="{% static "jsmol/js/JSmoljQueryExt.js" %}"></script>
+<script src="{% static "jsmol/JSmol.min.nojq.js" %}"></script>
 
 <!--personal jsmol functions-->
 <script src="{% static "jsmol_functions.js" %}"></script>
@@ -57,22 +51,29 @@ function goTo(name) {
 
 //info for JSMol window
 var info = {
+color: "#FFFFFF",  // white background (note this changes legacy default which was black)
+height: 720,      // pixels (but it may be in percent)
 width: 720,
-height: 720,
-j2sPath: "{% static "jsmol/j2s" %}",
-console: "jmolApplet0_infodiv",
+use: "HTML5",         // "HTML5" or "Java" (case-insensitive)
+j2sPath: "{% static "jsmol/j2s" %}",           // only used in the HTML5 modality
+defaultModel: "",
+script: null,
+src: null,
+readyFunction: null,
+addSelectionOptions: false,
+debug: false,
+disableInitialConsole: true
 };
 </script>
 
 <!--account for navbar, give space at bottom-->
 <style>
 body {
-padding-top: 60px;
 padding-bottom: 40px;
 }
 </style>
 </head>
-<body class="container">
+<body class="container" id="everything" style="display: none;">
 
 <!-- Nav bar -->
 <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation" style="z-index:9999;">
@@ -172,6 +173,12 @@ $(document).ready(function(){
     $('.dropdown-menu table, .dropdown-menu label').click(function(e) {
         e.stopPropagation();
     });
+</script>
+
+<script>
+$(document).ready(function(){
+	$('#everything').show();
+});
 </script>
 
 {% block content %}

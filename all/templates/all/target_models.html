@@ -2,7 +2,7 @@
 {% block content %}
 {% django_js jquery=false %}
 {% load static from staticfiles %}
-<div id="everything" style="width:100%; padding:5%; display: none;">
+
 <h1>{{ target.name }} models</h1>
 
 <p><a href="{% url 'target_info' target.name %}">View target details</a>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -144,7 +144,6 @@ $('#popover')
 //jsmol scripts will go here
 //create JSMol window
 jmolApplet0 = Jmol.getApplet("jmolApplet0", info);
-Jmol.script(jmolApplet0,"background white;");
 
 function re_render() {
 //find which models are selected and create an array of filepaths
@@ -466,7 +465,7 @@ document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
 
 {% endif %}
 
-<br><div id="method_comparison" style="width:1200px; height:600px;"></div>
+<br><div id="method_comparison" class="container" style="width:100%; height:600px;"></div>
 
 <script>
 //Method comparison graph
@@ -512,10 +511,4 @@ $(function () {
 
 <br><a href="#">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="{% url 'search' %}">Back to search</a>
-</div>
-<script>
-$(document).ready(function(){
-	$('#everything').show();
-});
-</script>
 {% endblock %}

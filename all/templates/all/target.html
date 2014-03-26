@@ -29,10 +29,10 @@
 </tr>
 {% for complex in Rigid %}
 	<tr>
-	<td style="width: 100px"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank"><div class="pdb_id">{{ complex.name }}</div></a></td>
+	<td style="width: 100px"><div class="pdb_id"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></div></td>
 	<td><div class="category">{{ complex.category}}</div></td>
-	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank"><div class="rec_pdb_id">{{ complex.receptor }}</div></a></td>
-	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank"><div class="lig_pdb_id">{{ complex.ligand }}</div></a></td>	
+	<td style="width: 150px"><div class="rec_pdb_id"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></div></td>
+	<td style="width: 150px"><div class="lig_pdb_id"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></div></td>	
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
@@ -60,10 +60,10 @@
 </tr>
 {% for complex in Medium %}
         <tr>
-	<td style="width: 100px"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank"><div class="pdb_id">{{ complex.name }}</div></a></td>
+	<td style="width: 100px"><div class="pdb_id"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></div></td>
 	<td><div class="category">{{ complex.category}}</div></td>
-	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank"><div class="rec_pdb_id">{{ complex.receptor }}</div></a></td>
-	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank"><div class="lig_pdb_id">{{ complex.ligand }}</div></a></td>	
+	<td style="width: 150px"><div class="rec_pdb_id"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></div></td>
+	<td style="width: 150px"><div class="lig_pdb_id"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></div></td>	
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>
@@ -91,10 +91,10 @@
 </tr>
 {% for complex in Difficult %}
         <tr>
-	<td style="width: 100px"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank"><div class="pdb_id">{{ complex.name }}</div></a></td>
+	<td style="width: 100px"><div class="pdb_id"><a href="{{ pdb_url }}{{ complex.name }}" target="_blank">{{ complex.name }}</a></div></td>
 	<td><div class="category">{{ complex.category}}</div></td>
-	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank"><div class="rec_pdb_id">{{ complex.receptor }}</div></a></td>
-	<td style="width: 150px"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank"><div class="lig_pdb_id">{{ complex.ligand }}</div></a></td>	
+	<td style="width: 150px"><div class="rec_pdb_id"><a href="{{ pdb_url }}{{ complex.receptor }}" target="_blank">{{ complex.receptor }}</a></div></td>
+	<td style="width: 150px"><div class="lig_pdb_id"><a href="{{ pdb_url }}{{ complex.ligand }}" target="_blank">{{ complex.ligand }}</a></div></td>	
 	<td><div class="rec_description">{{ complex.receptor_description }}</div></td>
 	<td><div class="lig_description">{{ complex.ligand_description }}</div></td>
 	<td><div class="i_rmsd_target">{{ complex.i_rmsd }}</div></td>

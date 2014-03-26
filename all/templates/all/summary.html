@@ -4,152 +4,10 @@
 {% django_js jquery=false %}
 
 <div class="page-header">
-<h1>Summary <small>Some text</small></h1>
+<h1>Summary</h1>
 </div>
 
-<script>
-var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-</script>
-
-{% if at_least_one %}
-
-<div id="capri_comparison" style="width:100%; height:600px;"></div>
-
-<script>
-var acceptable_by_method_500 = [{% for a in acceptable_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-var acceptable_by_method_100 = [{% for b in acceptable_by_method_100 %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-var acceptable_by_method_10 = [{% for c in acceptable_by_method_10 %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-
-for (var i=0;i<acceptable_by_method_500.length;i++) {
-acceptable_by_method_500[i] = parseFloat(acceptable_by_method_500[i])
-acceptable_by_method_100[i] = parseFloat(acceptable_by_method_100[i])
-acceptable_by_method_10[i] = parseFloat(acceptable_by_method_10[i])
-}
-
-//remove cluspro columns to prevent graph begin misleading
-var methods_minus_cluspro = []
-var methods_only_cluspro = []
-var acceptable_minus_cluspro_500 = [];
-var acceptable_minus_cluspro_100 = [];
-var acceptable_minus_cluspro_10 = [];
-var acceptable_only_cluspro_500 = [];
-
-for (var i=0;i<methods.length;i++) {
-if (methods[i].slice(0,7) != 'ClusPro') {
-	methods_minus_cluspro.push(methods[i]);
-	acceptable_minus_cluspro_500.push(acceptable_by_method_500[i]);
-	acceptable_minus_cluspro_100.push(acceptable_by_method_100[i]);
-	acceptable_minus_cluspro_10.push(acceptable_by_method_10[i]);
-} else {
-	methods_only_cluspro.push(methods[i]);
-	acceptable_only_cluspro_500.push(acceptable_by_method_500[i]);
-}}
-
-$(function () {
-	$('#capri_comparison').highcharts({
-	chart: {
-		type: 'column'
-	},
-	title: {
-		text: 'Number of acceptable or better models produced by each docking method for {{ target_choice }}, a {{ target_difficulty }} target'
-	},
-	legend : {
-		enabled: true
-	},
-	xAxis: {
-		title: {
-			text: 'Docking method'
-		}
-	},
-	yAxis: {
-		min: 0,
-		title: {
-			text: 'Number of acceptable or better models produced in the top x models'
-		}
-	},
-	xAxis: {
-		categories: methods_minus_cluspro
-	},
-	series: [{
-		name: 'Top 500 models',
-		data: acceptable_minus_cluspro_500
-	}, {
-		name: 'Top 100 models',
-		data: acceptable_minus_cluspro_100
-	}, {
-		name: 'Top 10 models',
-		data: acceptable_minus_cluspro_10
-	}]
-	});
-});
-</script>
-
-<br><br><div id="cluspro_table"></div>
-
-<script>
-//construct cluspro table
-var cluspro_table_rows = "<table class=\"table\"><tr><th colspan=2>ClusPro also produced the following number of acceptable models using its method of producing 1000 models, clustering and outputting 25 structures.</th></tr>";
-for (var i=0;i<methods_only_cluspro.length;i++) {
-	cluspro_table_rows += "<tr><td>"+methods_only_cluspro[i]+"</td><td>"+acceptable_only_cluspro_500[i]+"</td></tr>";
-};
-cluspro_table_rows += "</table>";
-document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
-</script>
-
-{% else %}
-
-There were no acceptable models produced for this target. Choose another target to see how well the methods are able to choose acceptable models.<br><br>
-
-{% endif %}
-
-<div id="method_comparison" style="width:100%; height:600px;"></div>
-
-<script>
-//change method comparison graph when target choice is changed
-function change_graph(target) {
-document.location.href="/summary_"+target;
-}
-
-//Method comparison graph
-var irmsd_by_method = [{% for a in irmsd_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-var average_irmsds = [{% for b in average_irmsds %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
-
-for (var i=0;i<irmsd_by_method.length;i++) {
-irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
-average_irmsds[i] = parseFloat(average_irmsds[i])
-}
-
-$(function () {
-	$('#method_comparison').highcharts({
-	chart: {
-		type: 'column'
-	},
-	title: {
-		text: 'I-RMSD of best model produced by each docking method for {{ target_choice }}, a {{ target_difficulty }} target'
-	},
-	legend : {
-		enabled: false
-	},
-	xAxis: {
-		title: {
-			text: 'Docking method'
-		}
-	},
-	yAxis: {
-		title: {
-			text: 'I-RMSD of best model produced for {{ target_choice }} / \u212B;'
-		}
-	},
-	xAxis: {
-		categories: methods
-	},
-	series: [{
-		name: 'I-RMSD of best model',
-		data: irmsd_by_method
-	}]
-	});
-});
-</script>
+<h2>Per target</h2>
 
 <table class="table">
 <form name="target_choice"">
@@ -160,6 +18,8 @@ $(function () {
 {% endfor %}
 </select></td></tr>
 </form></table>
+
+<!-- other graph goes here -->
 
 <div id="irmsd_comparison" style="width:100%; height:600px;"></div>
 
@@ -249,6 +109,57 @@ $(function () {
 			symbol: 'circle'
 		},
 		color: '#000099'
+	}]
+	});
+});
+</script>
+
+<h2>Across all targets</h2>
+
+<script>
+//change method comparison graph when target choice is changed
+function change_graph(target) {
+window.location.href=Django.url('summary',{'target':target});;
+}
+
+<div id="method_comparison" style="width:100%; height:600px;"></div>
+
+//Method comparison graph
+var irmsd_by_method = [{% for a in irmsd_by_method %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+var average_irmsds = [{% for b in average_irmsds %}"{{ b }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
+
+for (var i=0;i<irmsd_by_method.length;i++) {
+irmsd_by_method[i] = parseFloat(irmsd_by_method[i])
+average_irmsds[i] = parseFloat(average_irmsds[i])
+}
+
+$(function () {
+	$('#method_comparison').highcharts({
+	chart: {
+		type: 'column'
+	},
+	title: {
+		text: 'I-RMSD of best model produced by each docking method for {{ target_choice }}, a {{ target_difficulty }} target'
+	},
+	legend : {
+		enabled: false
+	},
+	xAxis: {
+		title: {
+			text: 'Docking method'
+		}
+	},
+	yAxis: {
+		title: {
+			text: 'I-RMSD of best model produced for {{ target_choice }} / \u212B;'
+		}
+	},
+	xAxis: {
+		categories: methods
+	},
+	series: [{
+		name: 'I-RMSD of best model',
+		data: irmsd_by_method
 	}]
 	});
 });

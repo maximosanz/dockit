@@ -193,9 +193,9 @@ if (models_selected.length > 10) {
 </td></tr></table>
 
 <form name="term_form" onSubmit="return false">
-JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300px" />
+JSMol terminal:&nbsp;&nbsp;<input type="text" name="terminal" style="width: 300px" placeholder="e.g. 'select SER; color black'" />
 <button onClick=update_Jmol(document.term_form.terminal.value)>Update</button>
-<button onClick=reset_Jmol();>Reset</button></form><br>
+<button onClick=re_render();>Reset</button></form><br>
 
 <script>
 $(document).ready(re_render());

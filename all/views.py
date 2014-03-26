@@ -402,8 +402,8 @@ def refinement(request,method,refinement,target,cutoff):
 	improvements = []
 	ref_model_ids = []
 	for i in range(500):
-		no_ref_irmsds.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd)
-		improvements.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd - Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='Nothing').i_rmsd)
+		no_ref_irmsds.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='-').i_rmsd)
+		improvements.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd - Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='-').i_rmsd)
 		ref_model_ids.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).id)
 	context = {'method':method,'refinement':refinement,'target':target,'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids,'target_names':Target.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'refinement_names':Refinement.objects.values_list('name',flat=True),'cutoff':cutoff}
 	return insert_form_and_go(request, 'all/refinement.html', context)

@@ -286,20 +286,40 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 		results = results.filter(method__name=method)
 	if refinement != 'All':
 		results = results.filter(refinement__name=refinement)
-	results=results.values('id','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','number','target__receptor_bound_chain','capri_ev','capri_valid','no_clashes','asa_c','asa_rl')
-	capri_ranks=['Incorrect','Acceptable','Medium','High']
-	for model in results:
-		model['method__name_lower']=model['method__name'].lower()
-		model['target__difficulty_lower']=model['target__difficulty'].lower()
-		model['dasa']=model['asa_rl']-model['asa_c']
-		if model['capri_valid'] == 0:
-			model['capri_rank']='Removed'
-		else:
-			model['capri_rank']=capri_ranks[model['capri_ev']]
-		if (model['refinement__name'] == "-"):
-			model['refinement__name_lower'] = "nothing"
-		else:
-			model['refinement__name_lower'] = model['refinement__name'].lower()
+	count=results.count()
+	results=results.values('id','i_rmsd','l_rmsd','r_rmsd','fnat','i_l_rmsd','method__name','refinement__name','target__name','target__difficulty','number','target__receptor_bound_chain','capri_ev','capri_valid','no_clashes','asa_c','asa_rl','score__scoring_function__name','score__score')
+	if not results:
+		return insert_form_and_go(request, 'all/noresults.html', {})
+	else:
+		final_results=[]
+		capri_ranks=['Incorrect','Acceptable','Medium','High']
+		j=0
+		for i in range(count):
+			final_results.append(results[i+j])
+			model=final_results[i]
+			model['method__name_lower']=model['method__name'].lower()
+			model['refinement__name_lower']=model['refinement__name'].lower()
+			model['target__difficulty_lower']=model['target__difficulty'].lower()
+			model['dasa']=model['asa_rl']-model['asa_c']
+			if model['capri_valid'] == 0:
+				model['capri_rank']='Removed'
+			else:
+				model['capri_rank']=capri_ranks[model['capri_ev']]
+			for sc_f in ScoringFunction.objects.all().values('name'):
+				final_results[i][sc_f['name'].lower()+'_score']='Not scored'
+			sc_f=model['score__scoring_function__name']
+			cur_id=final_results[i]['id']
+			cur_i=i
+			if sc_f != None:
+				while i+j<len(results) and results[i+j]['id']==cur_id:
+					sc_f=results[i+j]['score__scoring_function__name']
+					if results[i+j]['score__score'] == None:
+						final_results[cur_i][sc_f.lower()+'_score']='Unable to score model'
+					else:
+						final_results[cur_i][sc_f.lower()+'_score']=results[i+j]['score__score']
+					if i != cur_i:
+						j+=1					
+					i+=1
 
 	#get data for method comparison graph
 	target_difficulty = target.difficulty
@@ -379,15 +399,18 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 				if (irmsd_by_method[i] == 0 or irmsd_by_method[i] > model['i_rmsd']):
 					if (model['capri_valid'] == 1):
 						irmsd_by_method[i] = model['i_rmsd']
-				break;
+				break
 	
-	at_least_one = False;
+	at_least_one = False
+	at_least_one_no_cluspro = False
 	for method in acceptable_by_method_500:
 		if (method > 0):
 			at_least_one = True;
-			break;
+			if not re.match("cluspro", methods[acceptable_by_method_500.index(method)], re.IGNORECASE):
+				at_least_one_no_cluspro = True
+				break
 
-	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':results,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'medium_by_method_500':medium_by_method_500,'medium_by_method_100':medium_by_method_100,'medium_by_method_10':medium_by_method_10,'high_by_method_500':high_by_method_500,'high_by_method_100':high_by_method_100,'high_by_method_10':high_by_method_10,'at_least_one':at_least_one}
+	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':final_results,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'medium_by_method_500':medium_by_method_500,'medium_by_method_100':medium_by_method_100,'medium_by_method_10':medium_by_method_10,'high_by_method_500':high_by_method_500,'high_by_method_100':high_by_method_100,'high_by_method_10':high_by_method_10,'at_least_one':at_least_one,'at_least_one_no_cluspro':at_least_one_no_cluspro}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	
 

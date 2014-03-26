@@ -63,11 +63,12 @@ def summary(request,target):
 	acceptable_by_method_500 = []
 	acceptable_by_method_100 = []
 	acceptable_by_method_10 = []
+	best_irmsd_model_by_method = []
 	
 	#averages across all targets need only be calculated once - here temporarily
 	#average_irmsds = [5.20,12.68,2.78,5.75,5.75,6.44,6.21,7.54,9.02]
 	
-	models = Model.objects.filter(target__name=target).values('number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
+	models = Model.objects.filter(target__name=target).values('id','number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
 	
 	#produces a readable name for method and refinement
 	def get_field_name(method,refinement):
@@ -83,6 +84,7 @@ def summary(request,target):
 		if field_name not in methods:
 			methods.append(field_name)
 			irmsd_by_method.append(0)
+			best_irmsd_model_by_method.append(0)
 			acceptable_by_method_500.append(0)
 			acceptable_by_method_100.append(0)
 			acceptable_by_method_10.append(0)
@@ -104,6 +106,7 @@ def summary(request,target):
 						acceptable_by_method_500[i] += 1
 				if (irmsd_by_method[i] == 0 or irmsd_by_method[i] > model['i_rmsd']):
 					irmsd_by_method[i] = model['i_rmsd']
+					best_irmsd_model_by_method[i] = model['id']
 				break;
 	
 	at_least_one = False;
@@ -111,8 +114,8 @@ def summary(request,target):
 		if (method > 0):
 			at_least_one = True;
 			break;
-
-	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'at_least_one':at_least_one}
+	print best_irmsd_model_by_method
+	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'at_least_one':at_least_one,'best_irmsd_model_by_method':best_irmsd_model_by_method}
 	return insert_form_and_go(request,'all/summary.html',context)
 
 def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str, bypass):
@@ -334,8 +337,9 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 	high_by_method_500 = []
 	high_by_method_100 = []
 	high_by_method_10 = []
+	best_irmsd_model_by_method = []
 
-	models = Model.objects.filter(target__name=name).values('number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
+	models = Model.objects.filter(target__name=name).values('id','number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
 	
 	#produces a readable name for method and refinement
 	def get_field_name(method,refinement):
@@ -360,6 +364,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 			high_by_method_500.append(0)
 			high_by_method_100.append(0)
 			high_by_method_10.append(0)
+			best_irmsd_model_by_method.append(0)
 
 	#construct arrays of values
 	for model in models:
@@ -399,6 +404,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 				if (irmsd_by_method[i] == 0 or irmsd_by_method[i] > model['i_rmsd']):
 					if (model['capri_valid'] == 1):
 						irmsd_by_method[i] = model['i_rmsd']
+						best_irmsd_model_by_method[i] = model['id']
 				break
 	
 	at_least_one = False
@@ -410,7 +416,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 				at_least_one_no_cluspro = True
 				break
 
-	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':final_results,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'medium_by_method_500':medium_by_method_500,'medium_by_method_100':medium_by_method_100,'medium_by_method_10':medium_by_method_10,'high_by_method_500':high_by_method_500,'high_by_method_100':high_by_method_100,'high_by_method_10':high_by_method_10,'at_least_one':at_least_one,'at_least_one_no_cluspro':at_least_one_no_cluspro}
+	context = {'target':target, 'hide_rec_chains':hide_rec_chains, 'results':final_results,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'medium_by_method_500':medium_by_method_500,'medium_by_method_100':medium_by_method_100,'medium_by_method_10':medium_by_method_10,'high_by_method_500':high_by_method_500,'high_by_method_100':high_by_method_100,'high_by_method_10':high_by_method_10,'at_least_one':at_least_one,'at_least_one_no_cluspro':at_least_one_no_cluspro,'best_irmsd_model_by_method':best_irmsd_model_by_method}
 	return insert_form_and_go(request, 'all/target_models.html', context)
 	
 
@@ -514,7 +520,6 @@ def insert_form_and_go(request,template,context):
 	else:
 		form = model_select_form(request.POST)
 		if form.is_valid():
-			print "got here"
 		        target = form.cleaned_data['target']
 		        method = form.cleaned_data['method']
 			refinement = form.cleaned_data['refinement']

@@ -239,21 +239,25 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 def scoring(request, scorer, target, cutoff):
 	#comparison of scoring functions
 	model_irmsds = []
-	scores = []
+	model_scores = []
 	model_ids = []
 	model_methods = []
 
-	subset = Score.objects.filter(model__target__name=target,scoring_function__name=scorer)
-	for each in subset:
-		try:
-			model_irmsds.append(each.model.i_rmsd)
-			scores.append(each.score)
-			model_ids.append(each.model.id)
-			model_methods.append(each.model.method.name)
-		except:
-			print('error')
+	scores = Score.objects.filter(model__target__name=target).exclude(score__isnull=True).values('scoring_function__name','score','model__method__name','model__i_rmsd','model__id')
+	for score in scores:
+		if (score['scoring_function__name'] == scorer):
+			model_irmsds.append(score['model__i_rmsd'])
+			model_scores.append(score['score'])
+			model_ids.append(score['model__id'])
+			model_methods.append(score['model__method__name'])
 
-	context = {'target_names':Target.objects.values_list('name',flat=True),'scorer_names':ScoringFunction.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'target_choice':target,'scorer_choice':scorer,'model_irmsds':model_irmsds,'scores':scores,'model_ids':model_ids,'model_methods':model_methods,'cutoff':cutoff}
+	if model_irmsds:
+		at_least_one_score = True
+	else:
+		at_least_one_score = False
+
+	context = {'target_names':Target.objects.values_list('name',flat=True),'scorer_names':ScoringFunction.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'target_choice':target,'scorer_choice':scorer,'model_irmsds':model_irmsds,'scores':model_scores,'model_ids':model_ids,'model_methods':model_methods,'cutoff':cutoff,'at_least_one_score':at_least_one_score}
+
 	return insert_form_and_go(request, 'all/scoring.html', context)
 
 def model(request, id):
@@ -287,6 +291,7 @@ def model(request, id):
 	pisa_score = get_score('PISA')
 
         context = {'model':model,'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=",'dasa':dasa,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score}
+
         return insert_form_and_go(request, 'all/model.html', context)
 
 def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str):
@@ -470,23 +475,34 @@ def refinement(request,method,refinement,target,cutoff):
 	improvements = []
 	ref_model_ids = []
 
-	models = Model.objects.filter(target__name=target,method__name=method,irmsd__lte=cutoff).values('id','refinement__name','i_rmsd','number')
+	models = Model.objects.filter(target__name=target).values('id','method__name','refinement__name','i_rmsd','number')
 
 	for i in range(500):
+		ref_checked = False
+		no_ref_checked = False
 		for model in models:
-			if (model.number == i and model.refinement=refinement):
-				refined_irmsd = model.i_rmsd
-			if (model.number == i and model.refinement='-'):
-				no_ref_irmsd = model.i_rmsd
-		improvements.append(refined_irmsd - no_ref_irmsd)
+			if (model['method__name'] == method):
+				if (model['number'] == i and model['refinement__name'] == refinement):
+					refined_irmsd = model['i_rmsd']
+					ref_model_id = model['id']
+					ref_checked = True
+				if (model['number'] == i and model['refinement__name'] == '-'):
+					no_ref_irmsd = model['i_rmsd']
+					no_ref_checked = True
+		if (ref_checked == True and no_ref_checked == True):
+			no_ref_irmsds.append(no_ref_irmsd)
+			improvements.append(refined_irmsd - no_ref_irmsd)
+			ref_model_ids.append(ref_model_id)
 
+	if no_ref_irmsds:
+		results_to_show = True
+	else:
+		results_to_show = False
 
-	for i in range(500):
-		no_ref_irmsds.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='-').i_rmsd)
-		improvements.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).i_rmsd - Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name='-').i_rmsd)
-		ref_model_ids.append(Model.objects.get(target__name=target,method__name=method,number=i+1,refinement__name=refinement).id)
+	method_names = ['PatchDock','ZDOCK','Hex','Hex-OPLSmin']
+	refinement_names = ['FiberDock','FireDock']
 
-	context = {'method':method,'refinement':refinement,'target':target,'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids,'target_names':Target.objects.values_list('name',flat=True),'method_names':Method.objects.values_list('name',flat=True),'refinement_names':Refinement.objects.values_list('name',flat=True),'cutoff':cutoff}
+	context = {'method':method,'refinement':refinement,'target':target,'no_ref_irmsds':no_ref_irmsds,'improvements':improvements,'ref_model_ids':ref_model_ids,'target_names':Target.objects.values_list('name',flat=True),'method_names':method_names,'refinement_names':refinement_names,'cutoff':cutoff,'results_to_show':results_to_show}
 
 	return insert_form_and_go(request, 'all/refinement.html', context)
 

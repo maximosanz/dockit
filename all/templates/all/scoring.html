@@ -4,8 +4,10 @@
 {% django_js jquery=false %}
 
 <div class="page-header">
-<h1>Scoring <small>Some text</small></h1>
+<h1>Scoring</h1>
 </div>
+
+{% if at_least_one_score %}
 
 <div id="scoring_graph" style="width:100%; height:600px;"></div>
 
@@ -87,24 +89,41 @@ $(function () {
 });
 </script>
 
+<br>Try changing the cutoff to see more results, but beware that scoring of poor quality models is difficult.<br><br><br>
+
+{% else %}
+
+There were no scores of the chosen type found for the chosen target. Please select different criteria.<br><br><br>
+
+{% endif %}
+
 <table class="table">
-<form name="scoring_graph_choices">
+<form name="scoring_graph_choices" onsubmit="return false">
 <tr><td>Choose a target:</td>
 <td><select name="target_choice_all" style="width: 90px">
 {% for each_target in target_names %}
+{% if each_target == target_choice %}
+<option selected="selected" value={{ each_target }}>{{ each_target }}</option>
+{% else %}
 <option value={{ each_target }}>{{ each_target }}</option>
+{% endif %}
 {% endfor %}
 </select></td></tr>
 <tr><td>Choose a scoring method:</td>
 <td><select name="scoring_method" style="width: 90px">
 {% for each_scorer in scorer_names %}
+{% if each_scorer == scorer_choice %}
+<option selected="selected" value={{ each_scorer }}>{{ each_scorer }}</option>
+{% else %}
 <option value={{ each_scorer }}>{{ each_scorer }}</option>
+{% endif %}
 {% endfor %}
 </select></td></tr>
 <tr><td>Choose a cut-off I-RMSD:</td>
-<td><input type="text" name="cutoff_irmsd" value="10" size=6></td></tr>
+<td><input type="text" name="cutoff_irmsd" value="{{ cutoff }}" size=6></td></tr>
 <tr><td></td><td><button type="button" onClick='change_graph(document.scoring_graph_choices.target_choice_all.options[document.scoring_graph_choices.target_choice_all.selectedIndex].value,document.scoring_graph_choices.scoring_method.options[document.scoring_graph_choices.scoring_method.selectedIndex].value,document.scoring_graph_choices.cutoff_irmsd.value)'>Update</button></td></tr>
 </form></table>
 
+<a href="#">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="{% url 'search' %}">Back to start</a>
 {% endblock %}

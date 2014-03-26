@@ -247,7 +247,7 @@ var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%en
 
 {% if at_least_one_no_cluspro %}
 
-<div id="capri_comparison" style="width:1200px; height:600px;"></div>
+<div id="capri_comparison" style="width:100%; height:600px;"></div>
 
 <script>
 var acceptable_by_method_500 = [{% for a in acceptable_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
@@ -499,7 +499,7 @@ $(function () {
 	},
 	yAxis: {
 		title: {
-			text: 'I-RMSD of best model produced for {{ target.name }} / \u212B;'
+			text: 'I-RMSD of best model produced for {{ target.name }} / \u212B'
 		}
 	},
 	xAxis: {

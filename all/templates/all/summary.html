@@ -12,7 +12,8 @@
 <table class="table">
 <form name="target_choice"">
 <tr><td>Choose a target:</td>
-<td><select name="target_choice_all" onChange='change_graph(document.target_choice.target_choice_all.options[document.target_choice.target_choice_all.selectedIndex].value)' style="width: 90px">
+<td><select name="target_choice_all" selected="{{ target_choice }}" onChange='change_graph(document.target_choice.target_choice_all.options[document.target_choice.target_choice_all.selectedIndex].value)' style="width: 90px">
+<option value="-">&nbsp;&nbsp;&nbsp;&nbsp;---</option>
 {% for each in target_names %}
 <option value={{ each }}>{{ each }}</option>
 {% endfor %}
@@ -22,8 +23,9 @@
 <script>
 //change graphs when target choice is changed
 function change_graph(target) {
-window.location.href=Django.url('summary',{'target':target});;
-}
+if (target != "-") {
+	window.location.href=Django.url('summary',{'target':target});;
+}}
 </script>
 
 <script>
@@ -32,7 +34,7 @@ var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%en
 
 {% if at_least_one_no_cluspro %}
 
-<div id="capri_comparison" style="width:1200px; height:600px;"></div>
+<div id="capri_comparison" style="width:100%; height:600px;"></div>
 
 <script>
 var acceptable_by_method_500 = [{% for a in acceptable_by_method_500 %}"{{ a }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
@@ -280,7 +282,7 @@ $(function () {
 	},
 	yAxis: {
 		title: {
-			text: 'I-RMSD of best model produced for {{ target_choice }} / \u212B;'
+			text: 'I-RMSD of best model produced for {{ target_choice }} / \u212B'
 		}
 	},
 	xAxis: {
@@ -389,5 +391,6 @@ $(function () {
 });
 </script>
 
+<a href="#">Back to top</a>&nbsp;&nbsp;&nbsp;&nbsp;
 <a href="{% url 'search' %}">Back to start</a>
 {% endblock %}

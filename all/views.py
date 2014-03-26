@@ -57,16 +57,19 @@ def summary(request,target):
 		except:
 			print(each.name)
 
-	#get data for method comparison graph
+	#get data for method comparison graphs
 	methods = []
 	irmsd_by_method = []
 	acceptable_by_method_500 = []
 	acceptable_by_method_100 = []
 	acceptable_by_method_10 = []
-	
-	#averages across all targets need only be calculated once - here temporarily
-	#average_irmsds = [5.20,12.68,2.78,5.75,5.75,6.44,6.21,7.54,9.02]
-	
+	medium_by_method_500 = []
+	medium_by_method_100 = []
+	medium_by_method_10 = []
+	high_by_method_500 = []
+	high_by_method_100 = []
+	high_by_method_10 = []
+
 	models = Model.objects.filter(target__name=target).values('number','method__name','refinement__name','i_rmsd','capri_ev','capri_valid')
 	
 	#produces a readable name for method and refinement
@@ -86,13 +89,19 @@ def summary(request,target):
 			acceptable_by_method_500.append(0)
 			acceptable_by_method_100.append(0)
 			acceptable_by_method_10.append(0)
+			medium_by_method_500.append(0)
+			medium_by_method_100.append(0)
+			medium_by_method_10.append(0)
+			high_by_method_500.append(0)
+			high_by_method_100.append(0)
+			high_by_method_10.append(0)
 
 	#construct arrays of values
 	for model in models:
 		field_name = get_field_name(model['method__name'],model['refinement__name'])
 		for i in range(len(methods)):
-			if (methods[i] == field_name):
-				if (model['capri_valid'] == 1 and model['capri_ev'] > 0):
+			if (methods[i] == field_name and model['capri_valid'] == 1):
+				if (model['capri_ev'] == 1):
 					if (model['number'] <= 10):
 						acceptable_by_method_500[i] += 1
 						acceptable_by_method_100[i] += 1
@@ -102,17 +111,41 @@ def summary(request,target):
 						acceptable_by_method_100[i] += 1
 					elif (model['number'] <= 500):
 						acceptable_by_method_500[i] += 1
+				elif (model['capri_ev'] == 2):
+					if (model['number'] <= 10):
+						medium_by_method_500[i] += 1
+						medium_by_method_100[i] += 1
+						medium_by_method_10[i] += 1
+					elif (model['number'] <= 100):
+						medium_by_method_500[i] += 1
+						medium_by_method_100[i] += 1
+					elif (model['number'] <= 500):
+						medium_by_method_500[i] += 1
+				elif (model['capri_ev'] == 3):
+					if (model['number'] <= 10):
+						high_by_method_500[i] += 1
+						high_by_method_100[i] += 1
+						high_by_method_10[i] += 1
+					elif (model['number'] <= 100):
+						high_by_method_500[i] += 1
+						high_by_method_100[i] += 1
+					elif (model['number'] <= 500):
+						high_by_method_500[i] += 1
 				if (irmsd_by_method[i] == 0 or irmsd_by_method[i] > model['i_rmsd']):
-					irmsd_by_method[i] = model['i_rmsd']
-				break;
+					if (model['capri_valid'] == 1):
+						irmsd_by_method[i] = model['i_rmsd']
+				break
 	
-	at_least_one = False;
+	at_least_one = False
+	at_least_one_no_cluspro = False
 	for method in acceptable_by_method_500:
 		if (method > 0):
 			at_least_one = True;
-			break;
+			if not re.match("cluspro", methods[acceptable_by_method_500.index(method)], re.IGNORECASE):
+				at_least_one_no_cluspro = True
+				break
 
-	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'at_least_one':at_least_one}
+	context = {'target_names':target_names,'target_irmsds':target_irmsds,'best_model_irmsds':best_model_irmsds,'target_difficulties':target_difficulties,'target_choice':target,'target_difficulty':target_difficulty.lower(),'methods':methods,'irmsd_by_method':irmsd_by_method,'acceptable_by_method_500':acceptable_by_method_500,'acceptable_by_method_100':acceptable_by_method_100,'acceptable_by_method_10':acceptable_by_method_10,'medium_by_method_500':medium_by_method_500,'medium_by_method_100':medium_by_method_100,'medium_by_method_10':medium_by_method_10,'high_by_method_500':high_by_method_500,'high_by_method_100':high_by_method_100,'high_by_method_10':high_by_method_10,'at_least_one':at_least_one,'at_least_one_no_cluspro':at_least_one_no_cluspro}
 	return insert_form_and_go(request,'all/summary.html',context)
 
 def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_threshold, r_rmsd_threshold, fnat_threshold, rank_str, bypass):
@@ -168,7 +201,10 @@ def model_select(request, target, method, refinement, i_rmsd_threshold, l_rmsd_t
 				final_results.append(results[i+j])
 				model=final_results[i]
 				model['method__name_lower']=model['method__name'].lower()
-				model['refinement__name_lower']=model['refinement__name'].lower()
+				if (model['refinement__name'] == '-'):
+					model['refinement__name_lower']='nothing'
+				else:
+					model['refinement__name_lower']=model['refinement__name'].lower()
 				model['target__difficulty_lower']=model['target__difficulty'].lower()
 				model['dasa']=model['asa_rl']-model['asa_c']
 				if model['capri_valid'] == 0:
@@ -298,7 +334,10 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 			final_results.append(results[i+j])
 			model=final_results[i]
 			model['method__name_lower']=model['method__name'].lower()
-			model['refinement__name_lower']=model['refinement__name'].lower()
+			if (model['refinement__name'] == '-'):
+				model['refinement__name_lower']='nothing'
+			else:
+				model['refinement__name_lower']=model['refinement__name'].lower()
 			model['target__difficulty_lower']=model['target__difficulty'].lower()
 			model['dasa']=model['asa_rl']-model['asa_c']
 			if model['capri_valid'] == 0:
@@ -321,7 +360,7 @@ def target_models(request, name, method, refinement, i_rmsd_threshold, l_rmsd_th
 						j+=1					
 					i+=1
 
-	#get data for method comparison graph
+	#get data for method comparison graphs
 	target_difficulty = target.difficulty
 	methods = []
 	irmsd_by_method = []

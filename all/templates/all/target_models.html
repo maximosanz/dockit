@@ -240,11 +240,11 @@ border-spacing:15px 10px;
 }
 </style>
 
+<br><h2 id="graphs" style="display: inline;">Method comparison</h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">Back to top</a><br><br>
+
 <script>
 var methods = [{% for c in methods %}"{{ c }}"{% if forloop.last %}{%else%},{%endif%}{% endfor %}];
 </script>
-
-<br><h2 id="graphs" style="display: inline;">Method comparison</h2>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="#">Back to top</a><br><br>
 
 {% if at_least_one_no_cluspro %}
 
@@ -459,7 +459,6 @@ for (var i=0;i<methods_only_cluspro.length;i++) {
 cluspro_table_rows += "</table>";
 document.getElementById("cluspro_table").innerHTML = cluspro_table_rows;
 </script>
-
 
 {% else %}
 

@@ -8,6 +8,8 @@
 </div>
 
 <table class="table"><tr>
+<th><span class="capri_rank">CAPRI Rank</span></th><th><span class="{{ capri_rank }}">{{ capri_rank }}</span></th>
+</tr><tr>
 
 <td colspan="2"><a href="{% url 'model_select' model.target.name 'All' 'All' 0 0 0 0 1 0 %}" class="view_models">View other models for {{ model.target.name }}</a></td>
 </tr><tr>
@@ -22,6 +24,10 @@
 
 <td><span class="refinement">Refinement</span></td>
 <td><span class="refinement">{{ model.refinement.name }}</span></td>
+</tr><tr>
+
+<td><span class="method_rank">Method Rank</span></td>
+<td><span class="method_rank">{{ model.number }}</span></td>
 </tr><tr>
 
 <td><span class="r_rmsd">R-RMSD</span></td>

@@ -3,7 +3,6 @@
 {% django_js jquery=false %}
 {% load static from staticfiles %}
 
-<div id="everything" style="display: none;">
 <h1>Model search results</h1><br>
 
 <form method="get" action="{% static "csv/all_models.tar.gz" %}"><button type="submit">Download data for all models</button>&nbsp;&nbsp;Download the complete table with all models in the database as a CSV file</form><br>
@@ -86,7 +85,6 @@
 <br>
 
 <a href="{% url 'search' %}">Back to search</a><br>
-</div>
 
 <style id="css">
 #popover-target label {
@@ -144,9 +142,6 @@ if ($.inArray(model_id, created_tooltip_list) == -1) {
 	created_tooltip_list.push(model_id);
 }
 };
-$(document).ready(function(){
-	$('#everything').show();
-});
 </script>
 
 {% endblock %}

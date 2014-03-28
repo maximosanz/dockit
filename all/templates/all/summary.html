@@ -334,12 +334,14 @@ $(function () {
 	xAxis: {
 		title: {
 			text: 'I-RMSD of native unbound'
-		}
+		},
+		min: 0
 	},
 	yAxis: {
 		title: {
 			text: 'I-RMSD of best model produced'
-		}
+		},
+		min: 0
 	},
 	plotOptions: {
 		series: {
@@ -366,6 +368,19 @@ $(function () {
 		}
 	},
 	series: [{
+		type: 'line',
+		name: 'Reference line',
+                data: [[0, 0], [10, 10]],
+                marker: {
+                    enabled: false
+                },
+                states: {
+                    hover: {
+                        lineWidth: 0
+                    }
+                },
+                enableMouseTracking: false
+	}, {
 		name: 'Rigid',
 		data: data_series_rigid,
 		marker: {

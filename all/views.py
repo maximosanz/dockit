@@ -291,7 +291,13 @@ def model(request, id):
 	pisa_score = get_score('PISA')
 	spider_score = get_score('SPIDER')
 
-        context = {'model':model,'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=",'dasa':dasa,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score,'spider_score':spider_score}
+	if model.capri_valid==0:
+		capri_rank="Removed"
+	else:
+		ranks=["Incorrect","Acceptable","Medium","High"]
+		capri_rank=ranks[model.capri_ev]
+
+        context = {'model':model,'pdb_url':"http://www.rcsb.org/pdb/explore/explore.do?structureId=",'dasa':dasa,'file_names':file_names,'model_rec_chains':model_rec_chains,'model_lig_chains':model_lig_chains,'ref_draw_5A_contacts':interactions['ref_draw_5A_contacts'],'ref_int_5A_residues':interactions['ref_int_5A_residues'],'ref_int_10A_residues':interactions['ref_int_10A_residues'],'inp_draw_5A_contacts':interactions['inp_draw_5A_contacts'],'inp_int_5A_residues':interactions['inp_int_5A_residues'],'inp_int_10A_residues':interactions['inp_int_10A_residues'],'zrank_score':zrank_score,'zrank2_score':zrank2_score,'pisa_score':pisa_score,'spider_score':spider_score,'capri_rank':capri_rank}
 
         return insert_form_and_go(request, 'all/model.html', context)
 

@@ -27,6 +27,7 @@
 <th data-priority="5" class="columnSelector-false th.dasa" data-placeholder="e.g. '<5000'">&#916;ASA</th>
 <th data-priority="5" class="columnSelector-false th.no_clashes" data-placeholder="e.g. '<60'">No. of clashes</th>
 <th data-priority="5" class="columnSelector-false th.i_l_rmsd l_i_rmsd" data-placeholder="e.g. '<3.1'">I-L-RMSD</th>
+<th data-priority="6" class="category columnSelector-false th.target.category" data-placeholder="e.g. 'A'">Target category</th>
 <th data-priority="6" class="columnSelector-false th.target.complex" data-placeholder="e.g. '1BGX'">Complex PDB ID</th>
 <th data-priority="6" class="columnSelector-false th.target.receptor rec_pdb_id" data-placeholder="e.g. '1BVL'">Receptor PDB ID</th>
 <th data-priority="6" class="columnSelector-false th.target.ligand lig_pdb_id" data-placeholder="e.g. '3LZT'">Ligand PDB ID</th>
@@ -54,6 +55,7 @@
 <td class="td.dasa row_id_{{ model.id }}">{{ model.dasa }}</td>
 <td class="td.no_clashes row_id_{{ model.id }}">{{ model.no_clashes }}</td>
 <td class="td.i_l_rmsd row_id_{{ model.id }}">{{ model.i_l_rmsd }}</td>
+<td class="td.target.category row_id_{{ model.id }}">{{ model.target__category }}</td>
 <td class="td.target.complex row_id_{{ model.id }}"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__complex }}">{{ model.target__complex }}</a></td>
 <td class="td.target.receptor row_id_{{ model.id }}"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__receptor }}">{{ model.target__receptor }}</a></td>
 <td class="td.target.ligand row_id_{{ model.id }}"><a target="_blank" href="http://www.rcsb.org/pdb/explore/explore.do?structureId={{ model.target__ligand }}">{{ model.target__ligand }}</a></td>
